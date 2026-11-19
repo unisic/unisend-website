@@ -345,7 +345,7 @@
 		['826', 'strings in the interface, each with its Polish. A test fails if one is missing.', 'src/i18n/pl.rs'],
 		['64', 'messages fit in each of the two queues between the screen and the network, so the screen never waits.', 'CHANNEL_CAP, src/backend.rs'],
 		['720 px', 'is where the desktop window turns into the phone app. On Android it is 840.', 'NARROW, src/ui.rs'],
-		['2.6 s', 'between the made-up messages in the phone at the top of this page.', 'the script of this page']
+		['2.6 s', 'between the made-up messages in the phone at the top of this page.', 'src/routes/+page.svelte']
 	];
 
 	const platforms = [
@@ -396,13 +396,22 @@
 			<div class="hero-copy">
 				<h1>Every chat.<br />One private app.</h1>
 				<p class="lead">A Matrix client for Android and desktop. With a Beeper account it also carries WhatsApp, Signal, Instagram, Messenger and the rest, in one list.</p>
-				<div class="actions"><a class="button" href="#features">See what it does</a><a class="text-link" href="#privacy">Who sees what</a></div>
-				<p class="note">No telemetry. No Google services. Built in Rust.</p>
+				<dl class="spec">
+					<div><dt>made of</dt><dd>Rust, GPUI, matrix-sdk</dd></div>
+					<div><dt>runs on</dt><dd>Android, Linux. macOS and Windows next</dd></div>
+					<div><dt>telemetry</dt><dd>none</dd></div>
+					<div><dt>Google services</dt><dd>none</dd></div>
+					<div><dt>push server</dt><dd>none, it keeps its own connection</dd></div>
+				</dl>
 			</div>
 			<div class="stage">
+				<div class="device">
 				<div class="stuck one" aria-hidden="true">{@render sticker({ ...stickers[3], rot: 14, curl: true })}</div>
 				<div class="stuck two" aria-hidden="true">{@render sticker({ ...stickers[4], rot: -12 })}</div>
-				<p class="aside live">Live: a new message every 2.6 seconds.</p>
+				<div class="dims" aria-hidden="true">
+					<span class="dim row-h">ROOM_ROW_H<b>72</b></span>
+					<span class="dim avatar-d">AVATAR<b>48</b></span>
+				</div>
 				<div class="phone" data-ui role="group" aria-label="A demo of the Unisend chat list. Tap a chat to read it." {@attach every(arrive, 2600)}>
 					<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
 					<div class="chips">
@@ -421,6 +430,8 @@
 					</ul>
 					{@render tabs()}
 				</div>
+				</div>
+				<p class="aside live">Live, drawn at 6/7 of the app's size: a new message every 2.6 s. Tap a chat to read it.</p>
 			</div>
 		</section>
 
@@ -468,7 +479,7 @@
 					<div class="grip" role="slider" tabindex="0" aria-label="Window width" aria-valuemin={MIN_W} aria-valuemax={MAX_W} aria-valuenow={vw} aria-valuetext="{vw} pixels" style:left="{vw * k}px" {@attach grip}></div>
 				</div>
 				<div class="ruler" aria-hidden="true">
-					{#each ticks as [x, name] (x)}<span style:left="{(Number(x) / (MAX_W + 24)) * 100}%" class:past={vw >= Number(x)} class:before={x === INFO_FROM}><b>{x}</b><small>{name}</small></span>{/each}
+					{#each ticks as [x, name] (x)}<span style:left="{(Number(x) / (MAX_W + 24)) * 100}%" class:past={vw >= Number(x)} class:before={x === INFO_FROM}><b>{x}</b><code>{name}</code></span>{/each}
 				</div>
 				<p class="aside">Drag the edge, or focus it and use the arrow keys. The widths are the app's own constants.</p>
 			</div>
@@ -477,6 +488,7 @@
 				<p class="aside n-rail">{@render arrow(true)}Under 720 px wide, this rail moves to the bottom and becomes the phone's tab bar.</p>
 				<p class="aside n-lime">{@render arrow(true)}Lime is for what is waiting for you.</p>
 				<p class="aside n-enter">{@render arrow(false)}Enter sends. There is a setting if you would rather it made a new line.</p>
+				<figcaption><b>fig. 1</b> The desktop app at 1280 &times; 800.</figcaption>
 			</figure>
 		</section>
 
@@ -485,7 +497,7 @@
 				<h2 id="talk-title">Talk like you do everywhere</h2>
 				<p>Replies, reactions, edits, polls, mentions and Markdown as you type. Photos, files and voice messages. Delete for everyone, or only for you.</p>
 			</div>
-			<div class="split-pic reveal"><img src="/shots/chat.png" alt="A group chat with a shared sunset, a reply, reactions and a poll" width="420" height="880" loading="lazy" /></div>
+			<figure class="split-pic reveal"><img src="/shots/chat.png" alt="A group chat with a shared sunset, a reply, reactions and a poll" width="420" height="880" loading="lazy" /><figcaption><b>fig. 2</b> A group chat: a photo, a reply, reactions, a poll. Made-up people.</figcaption></figure>
 		</section>
 
 		<section class="split flip wrap" aria-labelledby="look-title">
@@ -493,7 +505,7 @@
 				<h2 id="look-title">Black, quiet, yours</h2>
 				<p>Dark, light or system theme, nine chat colours, a wallpaper and five text sizes. In English and Polish.</p>
 			</div>
-			<div class="split-pic reveal"><img src="/shots/settings.png" alt="Appearance settings: theme, language, chat colour and text size" width="420" height="880" loading="lazy" /></div>
+			<figure class="split-pic reveal"><img src="/shots/settings.png" alt="Appearance settings: theme, language, chat colour and text size" width="420" height="880" loading="lazy" /><figcaption><b>fig. 3</b> Settings, Appearance. The nine colours are the stickers further down.</figcaption></figure>
 		</section>
 
 		<section class="split wrap" aria-labelledby="notify-title">
@@ -533,9 +545,12 @@
 					<p>No telemetry, no crash reports, no Google services, no push servers. What does leave the device goes to as few parties as it can.</p>
 				</div>
 				<div class="sees reveal">
-					<div class="parties" role="tablist" aria-label="Who sees what" aria-orientation="vertical">
+					<div class="parties" role="tablist" aria-label="Who sees what">
 						{#each sees as s, i (s.who)}
-							<button role="tab" id="sees-{i}" aria-selected={seen === i} aria-controls="sees-panel" onclick={() => (seen = i)}>{s.who}</button>
+							<span class="party">
+								<button role="tab" id="sees-{i}" aria-selected={seen === i} aria-controls="sees-panel" onclick={() => (seen = i)}>{s.who}</button>
+								{#if i < sees.length - 1}<span class="link" aria-hidden="true">{i < 3 ? '→' : 'and, only if you ask:'}</span>{/if}
+							</span>
 						{/each}
 					</div>
 					<div class="sees-panel" id="sees-panel" role="tabpanel" aria-labelledby="sees-{seen}">
@@ -551,26 +566,33 @@
 				<p>Counted anyway, with where each one comes from.</p>
 			</div>
 			<dl class="reveal">
-				{#each facts as [n, what, src] (n)}<div><dt {@attach count}>{n}</dt><dd>{what} From {src}.</dd></div>{/each}
+				{#each facts as [n, what, src] (n)}<div><dt {@attach count}>{n}</dt><dd>{what} <code>{src}</code></dd></div>{/each}
 			</dl>
 		</section>
 
-		<section class="platforms wrap" id="platforms" aria-labelledby="platforms-title">
-			<div class="head reveal">
-				<h2 id="platforms-title">Where it runs</h2>
-				<p>One Rust codebase. GPUI draws the interface and matrix-sdk talks to Matrix on its own thread, so the screen never waits on the network.</p>
-			</div>
-			<table class="reveal">
-				<tbody>{#each platforms as [os, state] (os)}<tr><th scope="row">{os}</th><td>{state}</td></tr>{/each}</tbody>
-			</table>
-		</section>
+		<div class="end wrap">
+			<section class="platforms" id="platforms" aria-labelledby="platforms-title">
+				<div class="head reveal">
+					<h2 id="platforms-title">Where it runs</h2>
+					<p>One Rust codebase. GPUI draws the interface and matrix-sdk talks to Matrix on its own thread, so the screen never waits on the network.</p>
+				</div>
+				<table class="reveal">
+					<tbody>{#each platforms as [os, state] (os)}<tr><th scope="row">{os}</th><td>{state}</td></tr>{/each}</tbody>
+				</table>
+			</section>
 
-		<section class="closing wrap" aria-labelledby="closing-title">
-			<img class="reveal" src="/icon.svg" alt="" width="112" height="112" loading="lazy" />
-			<h2 class="reveal" id="closing-title">Keep your account.<br />Choose your client.</h2>
-			<a class="button reveal" href="#top">Back to top</a>
-		</section>
+			<section class="colophon" aria-labelledby="colophon-title">
+				<h2 id="colophon-title">Colophon</h2>
+				<dl>
+					<div><dt>This page</dt><dd>Under 600 KB on a first visit, most of it the screenshots. No cookies, and nothing loaded from anyone else.</dd></div>
+					<div><dt>Type</dt><dd>Inter, the face the app draws with, and JetBrains Mono for what is quoted from the code. Both under the SIL Open Font License.</dd></div>
+					<div><dt>Icons</dt><dd>Lucide, under the <a href="/LICENSE-LUCIDE.txt">ISC licence</a>, the set the app uses.</dd></div>
+					<div><dt>Pictures</dt><dd>Screenshots of the app with made-up chats. Nobody real is in them.</dd></div>
+					<div><dt>The app</dt><dd>Version 0.1.0. Rust, GPUI for what you see, matrix-sdk for Matrix. Keep your account, choose your client.</dd></div>
+				</dl>
+			</section>
+		</div>
 	</main>
 
-	<footer class="footer wrap"><span>Unisend. No trackers on this page either.</span><a href="/LICENSE-LUCIDE.txt">Icons: Lucide, ISC licence</a></footer>
+	<footer class="footer wrap"><span>Unisend</span><a href="#top">Back to top</a></footer>
 </div>
