@@ -93,6 +93,94 @@
 	];
 	let seen = $state(1);
 
+	// Lucide icons (ISC) as die-cut stickers, one in each of the app's nine chat colours (ChatColour in the app).
+	const stickers = [
+		{ label: 'Voice notes', fill: '#2e6ef0', x: 6, y: 8, rot: -8, d: '<path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/>' },
+		{ label: 'Offline queue', fill: '#e8710a', x: 38, y: 4, rot: 6, d: '<path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/>' },
+		{ label: 'Local search', fill: '#00838f', x: 70, y: 10, rot: -4, d: '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>' },
+		{ label: 'App lock', fill: '#734ef3', x: 10, y: 40, rot: 5, d: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>' },
+		{ label: 'End to end', fill: '#2e7d32', x: 41, y: 37, rot: -7, d: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>', curl: true },
+		{ label: 'Quiet alerts', fill: '#c2185b', x: 72, y: 42, rot: 9, d: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"/><path d="m2 2 20 20"/><path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"/>' },
+		{ label: 'Nine colours', fill: '#4f5bd5', x: 5, y: 72, rot: -3, d: '<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/>' },
+		{ label: 'Reactions', fill: '#d32f2f', x: 39, y: 70, rot: 7, d: '<path d="M13.267 2.08a10 10 0 108.653 8.653"/><path d="M15 10V9"/><path d="M16 5h6"/><path d="M16.472 15a6 6 0 01-8.943 0"/><path d="M19 2v6"/><path d="M9 10V9"/>' },
+		{ label: 'Polls', fill: '#37474f', x: 71, y: 74, rot: -6, d: '<path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/>' }
+	];
+
+	/**
+	 * Lets a sticker be peeled: the grabbed corner folds over along the line halfway to the pointer, and
+	 * springs back on release. Work runs only while a sticker moves; one frame loop per sticker, stopped at rest.
+	 * @param {boolean} curl whether the sticker rests with a corner lifted, to show that it peels
+	 */
+	const peel = (curl = false) => (/** @type {HTMLElement} */ el) => {
+		const front = /** @type {HTMLElement} */ (el.querySelector('.front'));
+		const back = /** @type {HTMLElement} */ (el.querySelector('.back'));
+		let w = 0, h = 0, raf = 0, drag = false;
+		let p0 = [0, 0], p = [0, 0], goal = [0, 0], start = [0, 0];
+		const size = () => ({ width: w, height: h } = el.getBoundingClientRect());
+		const rest = () => (curl ? [p0[0] + (w / 2 - p0[0]) * 0.18, p0[1] + (h / 2 - p0[1]) * 0.18] : [...p0]);
+		/** Keeps the part of the square (padded, so a rotated drawing fits) on one side of the fold. */
+		const half = (/** @type {number[]} */ m, /** @type {number[]} */ n, /** @type {number} */ sign) => {
+			const box = [[-w, -h], [2 * w, -h], [2 * w, 2 * h], [-w, 2 * h]];
+			const side = (/** @type {number[]} */ q) => sign * ((q[0] - m[0]) * n[0] + (q[1] - m[1]) * n[1]);
+			const out = [];
+			for (let i = 0; i < box.length; i++) {
+				const a = box[i], b = box[(i + 1) % box.length], sa = side(a), sb = side(b);
+				if (sa >= 0) out.push(a);
+				if (sa * sb < 0) { const t = sa / (sa - sb); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+			}
+			return `polygon(${out.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+		};
+		const draw = () => {
+			const dx = p[0] - p0[0], dy = p[1] - p0[1], len = Math.hypot(dx, dy);
+			if (len < 0.5) { front.style.clipPath = ''; back.style.display = 'none'; return; }
+			const n = [dx / len, dy / len], m = [(p[0] + p0[0]) / 2, (p[1] + p0[1]) / 2];
+			const k = 2 * (m[0] * n[0] + m[1] * n[1]);
+			front.style.clipPath = half(m, n, 1);
+			back.style.display = 'block';
+			back.style.clipPath = half(m, n, -1);
+			// The folded part is the sticker reflected across the fold line.
+			back.style.transform = `matrix(${1 - 2 * n[0] * n[0]},${-2 * n[0] * n[1]},${-2 * n[0] * n[1]},${1 - 2 * n[1] * n[1]},${k * n[0]},${k * n[1]})`;
+		};
+		const tick = () => {
+			const fast = drag || reduced();
+			p = fast ? [...goal] : [p[0] + (goal[0] - p[0]) * 0.2, p[1] + (goal[1] - p[1]) * 0.2];
+			draw();
+			raf = !fast && Math.hypot(goal[0] - p[0], goal[1] - p[1]) > 0.3 ? requestAnimationFrame(tick) : 0;
+			if (!raf && !fast) { p = [...goal]; draw(); }
+		};
+		const go = (/** @type {number[]} */ to) => { goal = to; if (!raf) raf = requestAnimationFrame(tick); };
+		const local = (/** @type {PointerEvent} */ e) => { const r = el.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+		const corner = (/** @type {number[]} */ q) => [q[0] < w / 2 ? w * 0.14 : w * 0.86, q[1] < h / 2 ? h * 0.14 : h * 0.86];
+		const down = (/** @type {PointerEvent} */ e) => {
+			if (e.button !== 0) return;
+			size(); start = local(e); p0 = corner(start); p = [...p0]; drag = true;
+			el.setPointerCapture(e.pointerId); el.classList.add('held');
+			go(p0);
+		};
+		const move = (/** @type {PointerEvent} */ e) => {
+			const q = local(e);
+			if (drag) {
+				const dx = q[0] - start[0], dy = q[1] - start[1], len = Math.hypot(dx, dy), cap = 1.6 * Math.max(w, h);
+				const s = len > cap ? cap / len : 1;
+				go([p0[0] + dx * s, p0[1] + dy * s]);
+			} else if (e.pointerType === 'mouse') {
+				size(); p0 = corner(q); go([p0[0] + (w / 2 - p0[0]) * 0.22, p0[1] + (h / 2 - p0[1]) * 0.22]);
+			}
+		};
+		const up = () => { if (!drag) return; drag = false; el.classList.remove('held'); go(rest()); };
+		const leave = () => { if (!drag) go(rest()); };
+		size(); p0 = [w * 0.86, h * 0.86]; p = rest(); goal = [...p]; draw();
+		el.addEventListener('pointerdown', down);
+		el.addEventListener('pointermove', move);
+		el.addEventListener('pointerup', up);
+		el.addEventListener('pointercancel', up);
+		el.addEventListener('pointerleave', leave);
+		return () => {
+			cancelAnimationFrame(raf);
+			for (const [t, f] of /** @type {const} */ ([['pointerdown', down], ['pointermove', move], ['pointerup', up], ['pointercancel', up], ['pointerleave', leave]])) el.removeEventListener(t, f);
+		};
+	};
+
 	const extras = [
 		['Voice messages', 'Recorded and played right in the chat, on Android and Linux.'],
 		['Sent, even offline', 'Messages wait in a queue that survives losing signal and restarting the app.'],
@@ -101,6 +189,16 @@
 		['Encrypted, end to end', 'Verify a device by comparing emoji. History comes back with your recovery code.'],
 		['Every network in one list', 'Sign in to each network from the app, and see when one needs you again.']
 	];
+	// Counted in the app's repository (branch dev) when this page was made; `src` is the path they come from.
+	const facts = [
+		['52,422', 'lines of Rust, in 103 files.', 'src/'],
+		['359', 'tests, and all of them pass.', 'cargo test --lib'],
+		['826', 'strings in the interface, each with its Polish. A test fails if one is missing.', 'src/i18n/pl.rs'],
+		['64', 'messages fit in each of the two queues between the screen and the network, so the screen never waits.', 'CHANNEL_CAP, src/backend.rs'],
+		['720 px', 'is where the desktop window turns into the phone app. On Android it is 840.', 'NARROW, src/ui.rs'],
+		['2.6 s', 'between the made-up messages in the phone at the top of this page.', 'the script of this page']
+	];
+
 	const platforms = [
 		['Android', 'Main target, tested on a phone'],
 		['Linux', 'Built and tested'],
@@ -116,6 +214,13 @@
 	<meta property="og:description" content="A Matrix chat client for Android and desktop." />
 </svelte:head>
 
+{#snippet sticker(/** @type {{ d: string, fill: string, rot: number, curl?: boolean }} */ s)}
+	<div class="sticker" {@attach peel(s.curl)}>
+		<svg class="front" viewBox="-6 -6 36 36" style:--rot="{s.rot}deg"><g class="edge">{@html s.d}</g><g class="base" style:--fill={s.fill}>{@html s.d}</g><g class="mark">{@html s.d}</g></svg>
+		<svg class="back" viewBox="-6 -6 36 36" style:--rot="{s.rot}deg"><g class="edge">{@html s.d}</g></svg>
+	</div>
+{/snippet}
+{#snippet arrow(/** @type {boolean} */ down)}<svg class="arrow" viewBox="0 0 60 60" aria-hidden="true">{#if down}<path d="M54 6C32 8 14 22 11 52" /><path d="M4 44l7 9 7-8" />{:else}<path d="M54 54C32 52 14 38 11 8" /><path d="M4 16l7-9 7 8" />{/if}</svg>{/snippet}
 {#snippet icon(/** @type {string} */ d)}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">{@html d}</svg>{/snippet}
 
 <div class="page" {@attach observe}>
@@ -134,6 +239,9 @@
 				<p class="note">No telemetry. No Google services. Built in Rust.</p>
 			</div>
 			<div class="stage">
+				<div class="stuck one" aria-hidden="true">{@render sticker({ ...stickers[3], rot: 14, curl: true })}</div>
+				<div class="stuck two" aria-hidden="true">{@render sticker({ ...stickers[4], rot: -12 })}</div>
+				<p class="aside live">Live: a new message every 2.6 seconds.</p>
 				<div class="phone" data-ui role="img" aria-label="The Unisend chat list, where new messages arrive and move their chat to the top" {@attach every(arrive, 2600)}>
 					<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
 					<div class="chips"><span class="chip on">All</span><span class="chip">Unread <small>{unread}</small></span><span class="chip">Low priority</span></div>
@@ -160,7 +268,12 @@
 				<h2 id="desktop-title">Phone or desktop, one app</h2>
 				<p>Make the window wide and the chat list, the chat and its info sit side by side. Narrow it, and it is the phone app again.</p>
 			</div>
-			<img class="shot reveal" src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a shared sunset, a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
+			<figure class="annotated reveal">
+				<img class="shot" src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a shared sunset, a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
+				<p class="aside n-rail">{@render arrow(true)}Under 720 px wide, this rail moves to the bottom and becomes the phone's tab bar.</p>
+				<p class="aside n-lime">{@render arrow(true)}Lime is for what is waiting for you.</p>
+				<p class="aside n-enter">{@render arrow(false)}Enter sends. There is a setting if you would rather it made a new line.</p>
+			</figure>
 		</section>
 
 		<section class="split wrap" id="features" aria-labelledby="talk-title">
@@ -192,10 +305,20 @@
 		</section>
 
 		<section class="extras wrap" aria-labelledby="extras-title">
-			<h2 class="reveal" id="extras-title">And the rest of a good chat app</h2>
-			<dl class="reveal">
-				{#each extras as [title, text] (title)}<div><dt>{title}</dt><dd>{text}</dd></div>{/each}
-			</dl>
+			<div class="extras-copy">
+				<h2 class="reveal" id="extras-title">And the rest of a good chat app</h2>
+				<dl class="reveal">
+					{#each extras as [title, text] (title)}<div><dt>{title}</dt><dd>{text}</dd></div>{/each}
+				</dl>
+			</div>
+			<div class="sheet reveal" aria-hidden="true">
+				{#each stickers as s (s.label)}
+					<div class="spot" style:left="{s.x}%" style:top="{s.y}%">
+						<span class="print">{s.label}</span>
+						{@render sticker(s)}
+					</div>
+				{/each}
+			</div>
 		</section>
 
 		<section class="privacy" id="privacy" aria-labelledby="privacy-title">
@@ -215,6 +338,16 @@
 					</div>
 				</div>
 			</div>
+		</section>
+
+		<section class="facts wrap" aria-labelledby="facts-title">
+			<div class="head reveal">
+				<h2 id="facts-title">Numbers nobody asked for</h2>
+				<p>Counted anyway, with where each one comes from.</p>
+			</div>
+			<dl class="reveal">
+				{#each facts as [n, what, src] (n)}<div><dt>{n}</dt><dd>{what} From {src}.</dd></div>{/each}
+			</dl>
 		</section>
 
 		<section class="platforms wrap" id="platforms" aria-labelledby="platforms-title">

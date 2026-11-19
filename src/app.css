@@ -83,7 +83,7 @@ p { margin: 0; text-wrap: pretty; }
 .lead { max-width: 34em; font-size: var(--fs-lead); line-height: 1.5; color: var(--muted); }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 8px; }
 .note { color: var(--muted); font-size: var(--fs-small); }
-.stage { display: grid; place-items: center; padding: clamp(28px, 4vw, 56px) 16px; border-radius: var(--r); background: var(--surface); }
+.stage { position: relative; display: grid; place-items: center; padding: clamp(28px, 4vw, 56px) 16px 56px; border-radius: var(--r); background: var(--surface); }
 /* The phone draws the app's chat list (static/shots/chat-list.png) at the app's size. */
 .phone { width: min(100%, 360px); height: 660px; display: flex; flex-direction: column; overflow: hidden; border: 8px solid var(--well); border-radius: 44px; background: #000; }
 
@@ -91,6 +91,22 @@ p { margin: 0; text-wrap: pretty; }
 .head { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 64px; align-items: end; margin-bottom: 56px; }
 .head p { max-width: 44ch; color: var(--muted); }
 .shot { width: 100%; border-radius: 16px; background: var(--surface); }
+
+/* Margin notes: what a careful owner would point at, in the space around the picture. */
+.aside { margin: 0; max-width: 24ch; color: var(--muted); font-size: var(--fs-small); line-height: 1.4; }
+.arrow { position: absolute; width: 44px; height: 44px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.annotated { position: relative; margin: 0; padding-block: 96px; }
+.annotated .aside { position: absolute; }
+.annotated .arrow { left: -50px; }
+.n-rail { top: 8px; left: 58px; }
+.n-lime { top: 8px; left: calc(33% + 42px); }
+.n-rail .arrow, .n-lime .arrow { top: 22px; }
+.n-enter { bottom: 8px; left: calc(46% + 50px); }
+.n-enter .arrow { bottom: 18px; }
+.stuck { position: absolute; width: clamp(64px, 7vw, 92px); height: clamp(64px, 7vw, 92px); }
+.stuck.one { top: -26px; left: -34px; }
+.stuck.two { bottom: -30px; right: -30px; }
+.live { position: absolute; inset: auto 16px 14px; max-width: none; text-align: center; }
 
 /* Feature splits: words on one side, the real screen on the other. */
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; padding-top: var(--gap); }
@@ -112,6 +128,22 @@ p { margin: 0; text-wrap: pretty; }
 .extras dl { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px clamp(24px, 4vw, 64px); }
 .extras dt { margin-bottom: 8px; font-weight: 600; }
 .extras dd { margin: 0; color: var(--muted); }
+.extras { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 80px); align-items: center; }
+.extras dl { grid-template-columns: 1fr 1fr; }
+
+/* The sticker sheet: each sticker peels off to the word printed under it. */
+.sheet { position: relative; aspect-ratio: 1; border-radius: var(--r); background: var(--surface); --s: clamp(76px, 9vw, 116px); }
+.spot { position: absolute; width: var(--s); height: var(--s); }
+.print { position: absolute; inset: 0; display: grid; place-items: center; padding: 18%; color: var(--muted); font-size: var(--fs-small); line-height: 1.2; text-align: center; }
+.sticker { position: absolute; inset: 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.sticker.held { cursor: grabbing; }
+.sticker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sticker g { transform: rotate(var(--rot)); transform-origin: 12px 12px; stroke-linecap: round; stroke-linejoin: round; }
+.sticker .edge { fill: #f2f2f2; stroke: #f2f2f2; stroke-width: 9; }
+.sticker .base { fill: var(--fill); stroke: var(--fill); stroke-width: 6; }
+.sticker .mark { fill: none; stroke: #fff; stroke-width: 2; }
+.sticker .back { display: none; transform-origin: 0 0; }
+.sticker .back .edge { fill: #d4d4d4; stroke: #d4d4d4; }
 
 /* Privacy: a field of its own. */
 .privacy { margin-top: var(--gap); padding-block: var(--gap); background: var(--surface); }
@@ -122,6 +154,12 @@ p { margin: 0; text-wrap: pretty; }
 .parties button[aria-selected='true'] { color: #000; background: var(--ink); font-weight: 500; }
 .sees-panel { min-height: 220px; padding: clamp(24px, 3vw, 40px); border-radius: var(--r); background: var(--well); }
 .sees-panel p { max-width: 36em; font-size: var(--fs-lead); line-height: 1.55; }
+
+/* Numbers from the code, each with where it was counted. */
+.facts { padding-top: var(--gap); }
+.facts dl { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px clamp(24px, 4vw, 64px); }
+.facts dt { margin-bottom: 14px; font-size: var(--fs-h2); font-weight: 600; line-height: 1; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.facts dd { margin: 0; max-width: 30ch; color: var(--muted); }
 
 /* Platforms: a real table. */
 .platforms { padding-top: var(--gap); }
@@ -181,14 +219,22 @@ p { margin: 0; text-wrap: pretty; }
 @keyframes pop { from { transform: scale(.6); opacity: 0; } }
 
 @media (max-width: 900px) {
-	.hero, .split, .head, .sees { grid-template-columns: 1fr; }
+	.hero, .split, .head, .sees, .extras { grid-template-columns: 1fr; }
 	.flip .split-copy { order: 0; }
 	.extras dl { grid-template-columns: 1fr 1fr; }
 	.parties { display: flex; flex-wrap: wrap; }
+	.facts dl { grid-template-columns: 1fr 1fr; }
+	.annotated { display: grid; gap: 14px; padding: 0; }
+	.annotated .aside { position: static; max-width: none; }
+	.annotated .arrow { display: none; }
+	.stuck.one { left: 12px; }
+	.stuck.two { right: 12px; }
 }
 @media (max-width: 600px) {
 	.nav nav a:not(:last-child) { display: none; }
 	.extras dl { grid-template-columns: 1fr; gap: 32px; }
+	.facts dl { grid-template-columns: 1fr; }
+	.stuck, .live { display: none; }
 	.phone { height: 600px; }
 	.platforms th { width: 45%; }
 	.footer { flex-direction: column; }
