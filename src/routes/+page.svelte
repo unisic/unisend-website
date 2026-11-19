@@ -330,14 +330,54 @@
 		};
 	};
 
-	const extras = [
-		['Voice messages', 'Recorded and played right in the chat, on Android and Linux.'],
-		['Sent, even offline', 'Messages wait in a queue that survives losing signal and restarting the app.'],
-		['Search on the device', 'One index across every chat, kept here, not on a server.'],
-		['Locked when you want', "Your phone's lock or an app PIN. Screenshots blocked on Android."],
-		['Encrypted, end to end', 'Verify a device by comparing emoji. History comes back with your recovery code.'],
-		['Every network in one list', 'Sign in to each network from the app, and see when one needs you again.']
-	];
+	// The Features section of the app's README.md (branch dev), item for item.
+	const features = /** @type {const} */ ([
+		['Chats', [
+			'Replies, reactions, edits, delete for everyone or only for you, forward to up to 5 chats',
+			'Markdown formatting when you type, mentions, drafts kept per chat',
+			'Polls (create, vote, end), contact cards, disappearing messages where the network allows them',
+			'Read and typing state, hidden from others by default ("Hide reading and typing")',
+			'Archive, pin, mute for a set time, mark as unread, swipe actions on chat rows',
+			'Message requests and invitations to accept, decline or block',
+			'Groups: add and remove members, change the name and picture, where your role allows it',
+			'Search across all chats in a local index on the device',
+			'Note to self, the same chat Beeper keeps',
+			'Messages you send wait in a queue that survives going offline and restarting the app'
+		]],
+		['Media', [
+			'Photos, videos and files, with a caption; drag and drop or paste on desktop',
+			'Full-screen picture viewer with zoom; a video player on Android',
+			'Voice messages: recorded and played in the chat on Android and Linux',
+			'Emoji picker with search, recents and skin tones; a GIF picker in builds with a KLIPY key',
+			"Each chat's media, links and files in its info page",
+			'Sending your location from Android'
+		]],
+		['Networks', [
+			'Sign in to any Matrix homeserver with its OAuth 2.0 service, single sign-on or a password',
+			'Sign in to Beeper with an email code',
+			'With a Beeper account: list your chat networks, sign in to them, see when one needs a new sign-in',
+			'Messenger: unlock encrypted history with its 6-digit PIN, when the bridge asks for it' // taste-skill-ignore: README wording, a literal unlock with a PIN
+		]],
+		['Privacy and security', [
+			"End-to-end encryption, and encrypted history unlocked with the account's recovery code",
+			'Device list: verify a device by comparing emoji, sign one out',
+			"App lock with the phone's lock (Android) or an app PIN",
+			'Screen security on Android: blocks screenshots and hides the app in the recent apps list',
+			"On Android the app's data is encrypted with a key held in the Android Keystore",
+			'Incognito keyboard switch on Android (asks the keyboard not to learn from what you type)'
+		]],
+		['Notifications', [
+			'Android: one notification per chat, with reply and mark as read',
+			'Android keeps its own background connection to the homeserver, with no push service',
+			'Linux desktop notifications with reply, mark as read and mute',
+			'Choose what notifications show: name and message, name only, or neither'
+		]],
+		['Desktop', [
+			'Chat list and chat side by side, chat info in a panel beside them',
+			'Keeps running with the window closed, with a tray icon on Linux',
+			'Its own title bar and window controls on Linux, where the compositor allows it'
+		]]
+	]);
 	// Counted in the app's repository (branch dev) when this page was made; `src` is the path they come from.
 	const facts = [
 		['52,422', 'lines of Rust, in 103 files.', 'src/'],
@@ -357,9 +397,9 @@
 </script>
 
 <svelte:head>
-	<title>Unisend | Every chat, one private app</title>
+	<title>Unisend, a Matrix client for Android and Linux</title>
 	<meta name="description" content="A Matrix chat client for Android and desktop. Any homeserver, or a Beeper account with its bridges to WhatsApp, Signal, Instagram and more. No telemetry, no Google services." />
-	<meta property="og:title" content="Unisend | Every chat, one private app" />
+	<meta property="og:title" content="Unisend, a Matrix client for Android and Linux" />
 	<meta property="og:description" content="A Matrix chat client for Android and desktop." />
 </svelte:head>
 
@@ -388,14 +428,14 @@
 	<a class="skip" href="#main">Skip to content</a>
 	<header class="nav wrap">
 		<a class="brand" href="#top" aria-label="Unisend, back to top"><img src="/icon.svg" alt="" width="28" height="28" />Unisend</a>
-		<nav aria-label="Sections"><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="#platforms">Platforms</a></nav>
+		<span class="ver">version 0.1.0</span>
 	</header>
 
 	<main id="main">
 		<section class="hero wrap" id="top">
 			<div class="hero-copy">
-				<h1>Every chat.<br />One private app.</h1>
-				<p class="lead">A Matrix client for Android and desktop. With a Beeper account it also carries WhatsApp, Signal, Instagram, Messenger and the rest, in one list.</p>
+				<h1>A Matrix client.</h1>
+				<p class="lead">For Android and the Linux desktop. Any homeserver works; a Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list.</p>
 				<dl class="spec">
 					<div><dt>made of</dt><dd>Rust, GPUI, matrix-sdk</dd></div>
 					<div><dt>runs on</dt><dd>Android, Linux. macOS and Windows next</dd></div>
@@ -437,13 +477,13 @@
 
 		<section class="desktop wrap" aria-labelledby="desktop-title">
 			<div class="head reveal">
-				<h2 id="desktop-title">Phone or desktop, one app</h2>
+				<h2 id="desktop-title">Resize this window</h2>
 				<p>Make the window wide and the chat list, the chat and its info sit side by side. Narrow it, and it is the phone app again.</p>
 			</div>
 			<div class="resize reveal" {@attach fit}>
 				<p class="readout"><b>{vw.toLocaleString('en')} px</b><span>{layout.rule}</span></p>
 				<div class="frame" style:height="{WIN_H * k}px">
-					<div class="win" class:narrow={layout.phone} style:width="{vw}px" style:height="{WIN_H}px" style:scale={k} aria-hidden="true">
+					<div class="win" data-ui class:narrow={layout.phone} style:width="{vw}px" style:height="{WIN_H}px" style:scale={k} aria-hidden="true">
 						{#if !layout.phone}
 							<div class="win-nav" style:width="{layout.nav}px" class:labelled={layout.nav === W.NAV_W}>
 								{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
@@ -492,42 +532,30 @@
 			</figure>
 		</section>
 
-		<section class="split wrap" id="features" aria-labelledby="talk-title">
-			<div class="split-copy reveal">
-				<h2 id="talk-title">Talk like you do everywhere</h2>
-				<p>Replies, reactions, edits, polls, mentions and Markdown as you type. Photos, files and voice messages. Delete for everyone, or only for you.</p>
+		<section class="screens wrap" aria-labelledby="screens-title">
+			<div class="head reveal">
+				<h2 id="screens-title">Screenshots</h2>
+				<p>Taken from the app, with made-up chats. Nobody real is in them.</p>
 			</div>
-			<figure class="split-pic reveal"><img src="/shots/chat.png" alt="A group chat with a shared sunset, a reply, reactions and a poll" width="420" height="880" loading="lazy" /><figcaption><b>fig. 2</b> A group chat: a photo, a reply, reactions, a poll. Made-up people.</figcaption></figure>
-		</section>
-
-		<section class="split flip wrap" aria-labelledby="look-title">
-			<div class="split-copy reveal">
-				<h2 id="look-title">Black, quiet, yours</h2>
-				<p>Dark, light or system theme, nine chat colours, a wallpaper and five text sizes. In English and Polish.</p>
-			</div>
-			<figure class="split-pic reveal"><img src="/shots/settings.png" alt="Appearance settings: theme, language, chat colour and text size" width="420" height="880" loading="lazy" /><figcaption><b>fig. 3</b> Settings, Appearance. The nine colours are the stickers further down.</figcaption></figure>
-		</section>
-
-		<section class="split wrap" aria-labelledby="notify-title">
-			<div class="split-copy reveal">
-				<h2 id="notify-title">Notifications that keep quiet</h2>
-				<p>Choose what a notification shows. No push service either: on Android the app keeps its own connection to your homeserver.</p>
-			</div>
-			<div class="split-pic levels reveal" data-ui>
-				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>See you at 8</span></span><figcaption>Name and message</figcaption></figure>
-				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>New message</span></span><figcaption>Name only</figcaption></figure>
-				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Unisend</b>New message</span></span><figcaption>Neither</figcaption></figure>
+			<div class="strip reveal">
+				<figure><img src="/shots/chat.png" alt="A group chat with a shared sunset, a reply, reactions and a poll" width="420" height="880" loading="lazy" /><figcaption><b>fig. 2</b> A group chat: a photo, a reply, reactions, a poll. Replies, edits, mentions and Markdown as you type; delete for everyone, or only for you.</figcaption></figure>
+				<figure><img src="/shots/settings.png" alt="Appearance settings: theme, language, chat colour and text size" width="420" height="880" loading="lazy" /><figcaption><b>fig. 3</b> Settings, Appearance: dark, light or system theme, nine chat colours, a wallpaper and five text sizes, in English and Polish. The nine colours are the stickers further down.</figcaption></figure>
+				<figure class="levels" data-ui>
+					<span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>See you at 8</span></span><span class="level">Name and message</span>
+					<span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>New message</span></span><span class="level">Name only</span>
+					<span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Unisend</b>New message</span></span><span class="level">Neither</span>
+					<figcaption><b>fig. 4</b> The three things a notification can show; you pick one. No push service either: on Android the app keeps its own connection to your homeserver.</figcaption>
+				</figure>
 			</div>
 		</section>
 
 		<section class="extras wrap" aria-labelledby="extras-title">
 			<div class="extras-copy">
-				<h2 class="reveal" id="extras-title">And the rest of a good chat app</h2>
-				<dl class="reveal">
-					{#each extras as [title, text] (title)}<div><dt>{title}</dt><dd>{text}</dd></div>{/each}
-				</dl>
-			</div>
-			<div class="sheet reveal" aria-hidden="true">
+				<div class="reveal">
+					<h2 id="extras-title">The whole list</h2>
+					<p>The features section of the app's README, nothing left out.</p>
+				</div>
+				<div class="sheet reveal" aria-hidden="true">
 				{#each stickers as s (s.label)}
 					<div class="spot" style:left="{s.x}%" style:top="{s.y}%">
 						<span class="print">{s.label}</span>
@@ -535,6 +563,13 @@
 					</div>
 				{/each}
 				<p class="aside hint">Peel one back, or pull it right off and stick it anywhere on the page.</p>
+				</div>
+			</div>
+			<div class="all reveal">
+				{#each features as [group, items] (group)}
+					<div><h3>{group}</h3><ul>{#each items as item (item)}<li>{item}</li>{/each}</ul></div>
+				{/each}
+				<p>Also: dark, light or system theme, chat colours, a chat wallpaper, text size, English and Polish.</p>
 			</div>
 		</section>
 

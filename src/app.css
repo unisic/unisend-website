@@ -77,9 +77,7 @@ p { margin: 0; text-wrap: pretty; }
 
 .nav { min-height: 80px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
-.nav nav { display: flex; gap: clamp(18px, 3vw, 40px); }
-.nav nav a { padding-block: 12px; color: var(--muted); text-decoration: none; transition: color .2s; }
-.nav nav a:hover { color: var(--ink); }
+.ver { color: var(--muted); font-size: var(--fs-small); }
 
 /* Hero: the claim and its spec on the left, the app itself, live and measured, on the right. */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 4vw, 64px); align-items: center; padding-block: clamp(32px, 6vw, 72px) var(--gap); }
@@ -128,32 +126,29 @@ figcaption b { margin-right: .5em; color: var(--ink); font-weight: 500; }
 .stuck.two { top: 520px; left: -104px; }
 .live { max-width: 360px; margin-top: 22px; }
 
-/* Feature splits: words on one side, the real screen on the other. */
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; padding-top: var(--gap); }
-.split-copy { display: grid; gap: 24px; max-width: 30em; }
-.split-copy p { color: var(--muted); font-size: var(--fs-lead); line-height: 1.5; }
-.split-pic { margin: 0; display: grid; justify-items: center; gap: 16px; }
-.split-pic > img { width: min(100%, 340px); border-radius: 20px; }
-.split-pic > figcaption { max-width: 340px; }
-.flip .split-copy { order: 2; }
-.levels { gap: 28px; justify-items: stretch; width: min(100%, 400px); justify-self: center; }
-.levels figure { margin: 0; display: grid; gap: 10px; }
+/* Three screens side by side, like a contact sheet; the captions carry what the headlines used to. */
+.screens { padding-top: var(--gap); }
+.strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.strip figure { margin: 0; display: grid; gap: 16px; }
+.strip > figure > img { width: 100%; border-radius: 20px; }
+.levels { gap: 10px; }
 .notif { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: center; padding: 14px 18px; border-radius: 22px; background: var(--well); font-size: 15px; line-height: 1.35; color: var(--muted); }
 .notif img { border-radius: 10px; }
 .notif b { display: block; color: var(--ink); font-weight: 500; }
-.levels figcaption { padding-left: 18px; color: var(--muted); font-size: var(--fs-small); }
+.level { margin-bottom: 18px; padding-left: 18px; color: var(--muted); font-size: var(--fs-small); }
 
-/* The rest, as a plain list in three columns. */
-.extras { padding-top: var(--gap); }
-.extras h2 { max-width: 14em; margin-bottom: 56px; }
-.extras dl { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px clamp(24px, 4vw, 64px); }
-.extras dt { margin-bottom: 8px; font-weight: 600; }
-.extras dd { margin: 0; color: var(--muted); }
-.extras { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 80px); align-items: center; }
-.extras dl { grid-template-columns: 1fr 1fr; }
+/* The README's feature list, whole, beside the sticker sheet. */
+.extras { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: clamp(32px, 5vw, 80px); align-items: start; padding-top: var(--gap); }
+.extras-copy { position: sticky; top: 32px; display: grid; gap: 40px; }
+.extras-copy h2 + p { margin-top: 16px; color: var(--muted); }
+.all { columns: 2; column-gap: clamp(24px, 3vw, 40px); line-height: 1.5; }
+.all > div { break-inside: avoid; margin-bottom: 28px; }
+.all h3 { margin: 0 0 10px; font-size: var(--fs-body); font-weight: 600; }
+.all ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; color: var(--muted); }
+.all > p { margin: 0; }
 
 /* The sticker sheet: each sticker peels off to the word printed under it. */
-.sheet { position: relative; aspect-ratio: 1; border-radius: var(--r); background: var(--surface); --s: clamp(76px, 9vw, 116px); }
+.sheet { position: relative; aspect-ratio: 1; border-radius: var(--r); background: var(--surface); container-type: inline-size; --s: min(22cqi, 116px); }
 .spot { position: absolute; width: var(--s); height: var(--s); }
 .print { position: absolute; inset: 0; display: grid; place-items: center; padding: 14%; color: var(--muted); font-size: 13px; line-height: 1.25; text-align: center; }
 .sticker { position: absolute; inset: 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -293,19 +288,19 @@ button.row:active { background: var(--well); }
 @keyframes pop { from { transform: scale(.6); opacity: 0; } }
 
 @media (max-width: 900px) {
-	.hero, .split, .head, .extras, .end { grid-template-columns: 1fr; }
+	.hero, .head, .extras, .end { grid-template-columns: 1fr; }
+	.extras { row-gap: 88px; }
+	.extras-copy { position: static; }
 	.colophon { padding-top: 64px; }
 	.stage { justify-self: center; padding-left: 150px; }
-	.flip .split-copy { order: 0; }
-	.extras dl { grid-template-columns: 1fr 1fr; }
 	.facts dl { grid-template-columns: 1fr 1fr; }
 	.annotated { display: grid; gap: 14px; padding: 0; }
 	.annotated .aside { position: static; max-width: none; }
 	.annotated .arrow { display: none; }
 }
 @media (max-width: 600px) {
-	.nav nav a:not(:last-child) { display: none; }
-	.extras dl { grid-template-columns: 1fr; gap: 32px; }
+	.all { columns: 1; }
+	.strip { grid-template-columns: minmax(0, 340px); justify-content: center; gap: 56px; }
 	.facts dl { grid-template-columns: 1fr; }
 	.stuck, .dims { display: none; }
 	.stage { justify-self: stretch; padding: 0; }
