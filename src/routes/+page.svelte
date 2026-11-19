@@ -61,28 +61,43 @@
 	let word = $state(0);
 	const nextWord = () => (word = (word + 1) % networks.length);
 
+	// The same synthetic chats as the app screenshots, drawn to the app's chat list.
 	let chats = $state([
-		{ id: 1, name: 'Maya Chen', net: 1, text: 'A bit torn, but it will do', unread: 2, hue: 300 },
-		{ id: 2, name: 'Weekend hike', net: 0, text: 'Jonas: Lake, obviously', unread: 0, hue: 140 },
-		{ id: 3, name: 'Ana Ruiz', net: 2, text: 'You: Yes, 10:30 at the usual place', unread: 0, hue: 22 },
-		{ id: 4, name: 'Daniel Park', net: 6, text: 'The slides are in the shared folder', unread: 0, hue: 205 },
-		{ id: 5, name: 'Climbing Tuesdays', net: 5, text: 'Chris: Gym is open until 10', unread: 0, hue: 350 },
-		{ id: 6, name: 'Mom', net: 3, text: 'Call me when you are back', unread: 0, hue: 15 },
-		{ id: 7, name: 'Elif Kaya', net: 4, text: 'You: Let me know how it turns out', unread: 0, hue: 265 }
+		{ id: 1, name: 'Maya Chen', text: 'A bit torn, but it will do', you: false, unread: 3, time: '10:35', hue: 310 },
+		{ id: 2, name: 'Weekend hike', text: 'Jonas Weber: Lake, obviously', you: false, unread: 6, time: '10:35', hue: 150 },
+		{ id: 3, name: 'Ana Ruiz', text: 'Yes, 10:30 at the usual place', you: true, unread: 0, time: '10:35', hue: 25 },
+		{ id: 4, name: 'Daniel Park', text: 'The slides are in the shared folder', you: false, unread: 0, time: '10:35', hue: 205 },
+		{ id: 5, name: 'Mom', text: "Call me when you're back", you: false, unread: 0, time: '10:35', hue: 12 },
+		{ id: 6, name: 'Elif Kaya', text: 'Let me know how it turns out', you: true, unread: 0, time: '10:35', hue: 262 },
+		{ id: 7, name: 'Climbing Tuesdays', text: 'Chris Novak: Gym is open until 10 tonight', you: false, unread: 0, time: '10:35', hue: 355 },
+		{ id: 8, name: 'Jonas Weber', text: 'Great, see you there', you: false, unread: 0, time: '10:34', hue: 210 }
 	]);
 	const incoming = [
-		[3, 'Lunch tomorrow?'], [2, 'Tom: Forecast says sun until 3'], [5, 'Lena: Who has the rope?'],
-		[1, 'Sent a photo'], [6, 'Did you eat?'], [2, 'Priya: Picnic it is'], [7, 'It worked!'], [3, 'Voice message, 0:14'], [4, 'Thanks, got them']
+		[3, 'Lunch tomorrow?'], [2, 'Tom Becker: Forecast says sun until 3'], [7, 'Lena Ortiz: Who has the rope?'],
+		[1, 'Sent a photo'], [5, 'Did you eat?'], [2, 'Priya Raman: Picnic it is'], [6, 'It worked!'], [3, 'Voice message'], [4, 'Thanks, got them']
 	];
-	const times = ['now', '2m', '9m', '24m', '1h', '2h', '5h'];
+	let clock = 10 * 60 + 35; // minutes since midnight
 	let step = 0;
 	const arrive = () => {
 		const [id, text] = incoming[step++ % incoming.length];
 		const [chat] = chats.splice(chats.findIndex((c) => c.id === id), 1);
-		chat.text = /** @type {string} */ (text);
-		chat.unread = (chat.unread % 3) + 1;
+		clock = (clock + 1) % (24 * 60);
+		const time = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, '0')}`;
+		Object.assign(chat, { text, time, you: false, unread: (chat.unread % 4) + 1 });
 		chats.unshift(chat);
-		for (const c of chats.slice(4)) c.unread = 0; // read further down, so the counts stay few
+		for (const c of chats.slice(3)) c.unread = 0; // read on another device, so the counts stay few
+	};
+	const unread = $derived(chats.reduce((n, c) => n + c.unread, 0));
+
+	// Lucide icons (ISC, see /LICENSE-LUCIDE.txt), the set the app draws with.
+	const ICONS = {
+		plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+		search: '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+		check: '<path d="M20 6 9 17l-5-5"/>',
+		chats: '<path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>',
+		archive: '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+		networks: '<path d="m10.586 5.414-5.172 5.172"/><path d="m18.586 13.414-5.172 5.172"/><path d="M6 12h12"/><circle cx="12" cy="20" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="12" r="2"/>',
+		settings: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>'
 	};
 
 	/** Moves a tile's light to the pointer. @param {PointerEvent} e */
@@ -113,6 +128,8 @@
 	<meta property="og:description" content="A Matrix chat client for Android and desktop." />
 </svelte:head>
 
+{#snippet icon(/** @type {string} */ d)}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">{@html d}</svg>{/snippet}
+
 <div class="page" {@attach observe}>
 	<a class="skip" href="#main">Skip to content</a>
 	<header class="nav">
@@ -142,33 +159,37 @@
 					<div class="hero-actions"><a class="button button-primary" href="#features">See what it does</a><a class="button button-secondary" href="#privacy">Who sees what</a></div>
 				</div>
 
-				<div class="phone" aria-label="A Unisend chat list where new messages from different networks arrive" role="img" {@attach every(arrive, 2600)}>
+				<div class="phone" aria-label="The Unisend chat list, where new messages arrive and move their chat to the top" role="img" {@attach every(arrive, 2600)}>
 					<div class="phone-screen">
-						<div class="phone-bar"><b>Chats</b><span class="chips"><i class="chip on">All</i><i class="chip">Unread</i></span></div>
+						<div class="phone-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
+						<div class="chips"><span class="chip on">All</span><span class="chip">Unread <small>{unread}</small></span><span class="chip">Low priority</span></div>
 						<ul class="rows">
-							{#each chats as chat, i (chat.id)}
-								<li class="row" class:fresh={i === 0} animate:flip={{ duration: 520, easing: cubicOut }}>
-									<span class="avatar" style:--h={chat.hue}><i style:background={networks[chat.net].color}></i></span>
-									<span class="row-text"><b>{chat.name}</b><span>{chat.text}</span></span>
-									<span class="row-meta"><small>{times[i]}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
+							{#each chats as chat (chat.id)}
+								<li class="row" class:unread={chat.unread} animate:flip={{ duration: 480, easing: cubicOut }}>
+									<span class="avatar" style:--h={chat.hue}></span>
+									<span class="row-text"><b>{chat.name}</b><span>{#if chat.you}{@render icon(ICONS.check)}You:{' '}{/if}{chat.text}</span></span>
+									<span class="row-meta"><small>{chat.time}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
 								</li>
 							{/each}
 						</ul>
-						<div class="tabs" aria-hidden="true"><span class="on">Chats</span><span>Archive</span><span>Networks</span><span>Settings</span></div>
+						<div class="tabs" aria-hidden="true">
+							{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
+								<span class:on={i === 0}>{@render icon(d)}{label}</span>
+							{/each}
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<div class="marquee" aria-hidden="true">
-			<div class="marquee-track">
-				{#each [0, 1] as copy (copy)}
-					<span class="marquee-set">
-						{#each networks as n (n.name)}<span class="marquee-item"><svg viewBox="20 24 68 64"><path d={LEFT} /><path d={RIGHT} /></svg>{n.name}</span>{/each}
-					</span>
-				{/each}
+		<section class="wide-view" aria-label="Unisend on desktop">
+			<div class="wrap">
+				<figure class="window reveal">
+					<img src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
+				</figure>
+				<p class="wide-caption reveal">Make the window wide and the chat list, the chat and its info sit side by side. Narrow it, and it is the phone app again.</p>
 			</div>
-		</div>
+		</section>
 
 		<section class="section story" id="story">
 			<div class="wrap story-inner reveal">
@@ -227,7 +248,7 @@
 						<h3>Every network in one list</h3>
 						<p>Any Matrix homeserver, plus the networks a Beeper account bridges. Sign in to each from the app, and see when one needs you again.</p>
 					</article>
-					<article class="tile demo reveal">
+					<article class="tile wide demo reveal">
 						<div class="notes" aria-hidden="true">
 							<span class="note n1"><b>Maya Chen</b>See you at 8</span>
 							<span class="note n2"><b>Maya Chen</b>New message</span>
@@ -236,15 +257,10 @@
 						<h3>Notifications that keep quiet</h3>
 						<p>Name and message, name only, or neither. No push service: Android keeps its own connection.</p>
 					</article>
-					<article class="tile demo reveal">
+					<article class="tile wide demo reveal">
 						<div class="verify" aria-hidden="true">{#each ['🐶', '🔑', '🚀', '🌵', '🎸', '🍕', '🐙'] as e, i (e)}<span style:--d="{i * 90}ms">{e}</span>{/each}</div>
 						<h3>Encrypted, end to end</h3>
 						<p>Verify a device by comparing emoji. History comes back with your recovery code.</p>
-					</article>
-					<article class="tile wide shot-tile reveal">
-						<img src="/shots/desktop.png" alt="Unisend on desktop: chat list beside a group chat" width="1280" height="800" loading="lazy" />
-						<h3>Wide window, side by side</h3>
-						<p>Chat list, chat and chat info next to each other. Runs on in the tray with the window closed.</p>
 					</article>
 				</div>
 			</div>
