@@ -1,11 +1,7 @@
 <script>
 	import { flip } from 'svelte/animate';
-	import { fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-
-	// The two halves of the app icon's U, in its 108-unit canvas.
-	const LEFT = 'M27.764,30.956L27.764,73.292Q27.764,81.524 24.236,85.64Q31.292,82.7 38.348,82.7L53.342,82.7L53.342,67.239A12.348,12.348 0 0 1 43.052,55.064L43.052,30.956A7.644,7.644 0 0 0 27.764,30.956Z';
-	const RIGHT = 'M57.458,82.623A27.636,27.636 0 0 0 83.036,55.064L83.036,30.956A7.644,7.644 0 0 0 67.748,30.956L67.748,55.064A12.348,12.348 0 0 1 57.458,67.239Z';
 
 	const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -88,13 +84,6 @@
 		clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'
 	};
 
-	const screens = [
-		{ name: 'Chat list' },
-		{ name: 'A chat', src: '/shots/chat.png', alt: 'A group chat with a photo, a reply and a poll' },
-		{ name: 'Appearance', src: '/shots/settings.png', alt: 'Appearance settings: theme, language, chat colour, text size' }
-	];
-	let screen = $state(0);
-
 	const sees = [
 		{ who: 'This device', what: 'Your messages, keys and settings. On Android the app\'s data is encrypted with a key held in the Android Keystore, and the app can lock with your phone\'s lock or a PIN.' },
 		{ who: 'Your homeserver', what: 'What any Matrix server sees: your account, the rooms you are in, message metadata, your IP address and the content of unencrypted rooms. Encrypted rooms are end-to-end encrypted.' },
@@ -102,16 +91,22 @@
 		{ who: 'The other network', what: 'WhatsApp, Messenger and the rest see what they always see. Nothing more comes from Unisend.' },
 		{ who: 'Anyone else', what: 'Only for what you turn on or tap: a site you link, once, with link previews on; GIF search, in builds that include it; an emoji font you download; a location you open. Builds made with an update address ask it once a day for update.json, with no identifier.' }
 	];
-	const zeros = [
-		['telemetry', 'Nothing about how you use the app is counted or sent.'],
-		['crash reports', 'No crash reporting. A crash is not sent anywhere.'],
-		['Google services', 'No Firebase and no Play Services in the app.'],
-		['push servers', 'No push service. On Android the app keeps its own connection to your homeserver.']
+	let seen = $state(1);
+
+	const extras = [
+		['Voice messages', 'Recorded and played right in the chat, on Android and Linux.'],
+		['Sent, even offline', 'Messages wait in a queue that survives losing signal and restarting the app.'],
+		['Search on the device', 'One index across every chat, kept here, not on a server.'],
+		['Locked when you want', "Your phone's lock or an app PIN. Screenshots blocked on Android."],
+		['Encrypted, end to end', 'Verify a device by comparing emoji. History comes back with your recovery code.'],
+		['Every network in one list', 'Sign in to each network from the app, and see when one needs you again.']
 	];
-	const platforms = [['Android', 'main target'], ['Linux', 'tested'], ['macOS', 'in progress'], ['Windows', 'compiles, never run']];
-	const wave = [6, 10, 16, 9, 22, 14, 26, 18, 12, 20, 28, 16, 10, 22, 14, 8, 18, 24, 12, 16, 8, 12, 20, 10, 6, 14, 9, 5];
-	// The words Matrix shows beside its seven verification emoji.
-	const sas = ['Dog', 'Key', 'Rocket', 'Cactus', 'Guitar', 'Pizza', 'Octopus'];
+	const platforms = [
+		['Android', 'Main target, tested on a phone'],
+		['Linux', 'Built and tested'],
+		['macOS', 'In progress'],
+		['Windows', 'Compiles, never run']
+	];
 </script>
 
 <svelte:head>
@@ -122,146 +117,122 @@
 </svelte:head>
 
 {#snippet icon(/** @type {string} */ d)}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">{@html d}</svg>{/snippet}
-{#snippet name()}<svg class="u" viewBox="24 23.3 59.2 62.4" aria-hidden="true"><path class="half-l" d={LEFT} /><path class="half-r" d={RIGHT} /></svg>nisend{/snippet}
 
 <div class="page" {@attach observe}>
 	<a class="skip" href="#main">Skip to content</a>
+	<header class="nav wrap">
+		<a class="brand" href="#top" aria-label="Unisend, back to top"><img src="/icon.svg" alt="" width="28" height="28" />Unisend</a>
+		<nav aria-label="Sections"><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="#platforms">Platforms</a></nav>
+	</header>
 
 	<main id="main">
-		<section class="hero" id="top">
-			<header class="nav">
-				<a class="brand" href="#top" aria-label="Unisend, back to top"><img src="/icon.svg" alt="" width="24" height="24" />Unisend</a>
-				<nav aria-label="Sections"><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="#platforms">Platforms</a></nav>
-			</header>
+		<section class="hero wrap" id="top">
 			<div class="hero-copy">
-				<p class="lead">Uni plus send: one private app for your Matrix chats and, with a Beeper account, WhatsApp, Signal, Instagram and the rest.</p>
-				<a class="button" href="#list">See it work</a>
+				<h1>Every chat.<br />One private app.</h1>
+				<p class="lead">A Matrix client for Android and desktop. With a Beeper account it also carries WhatsApp, Signal, Instagram, Messenger and the rest, in one list.</p>
+				<div class="actions"><a class="button" href="#features">See what it does</a><a class="text-link" href="#privacy">Who sees what</a></div>
+				<p class="note">No telemetry. No Google services. Built in Rust.</p>
 			</div>
-			<h1 class="monument"><span class="sr-only">Unisend</span><span aria-hidden="true">{@render name()}</span></h1>
-		</section>
-
-		<section class="showcase" id="list" aria-labelledby="list-title">
-			<div class="plate reveal">
-				<div class="screen" role="tabpanel" id="screen-panel" aria-labelledby="screen-{screen}">
-					{#if screen === 0}
-						<div class="app-list" data-ui role="img" aria-label="The Unisend chat list, where new messages arrive and move their chat to the top" {@attach every(arrive, 2600)} in:fade={{ duration: 200 }}>
-							<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
-							<div class="chips"><span class="chip on">All</span><span class="chip">Unread <small>{unread}</small></span><span class="chip">Low priority</span></div>
-							<ul class="rows">
-								{#each chats as chat (chat.id)}
-									<li class="row" class:unread={chat.unread} animate:flip={{ duration: 480, easing: cubicOut }}>
-										<span class="avatar" style:--h={chat.hue}></span>
-										<span class="row-text"><b>{chat.name}</b><span>{#if chat.you}{@render icon(ICONS.check)}You:{' '}{/if}{chat.text}</span></span>
-										<span class="row-meta"><small>{chat.time}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
-									</li>
-								{/each}
-							</ul>
-							<div class="app-tabs" aria-hidden="true">
-								{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
-									<span class:on={i === 0}>{@render icon(d)}{label}</span>
-								{/each}
-							</div>
-						</div>
-					{:else}
-						{#key screen}<img src={screens[screen].src} alt={screens[screen].alt} width="420" height="880" in:fade={{ duration: 200 }} />{/key}
-					{/if}
+			<div class="stage">
+				<div class="phone" data-ui role="img" aria-label="The Unisend chat list, where new messages arrive and move their chat to the top" {@attach every(arrive, 2600)}>
+					<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
+					<div class="chips"><span class="chip on">All</span><span class="chip">Unread <small>{unread}</small></span><span class="chip">Low priority</span></div>
+					<ul class="rows">
+						{#each chats as chat (chat.id)}
+							<li class="row" class:unread={chat.unread} animate:flip={{ duration: 480, easing: cubicOut }}>
+								<span class="avatar" style:--h={chat.hue}></span>
+								<span class="row-text"><b>{chat.name}</b><span>{#if chat.you}{@render icon(ICONS.check)}You:{' '}{/if}{chat.text}</span></span>
+								<span class="row-meta"><small>{chat.time}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
+							</li>
+						{/each}
+					</ul>
+					<div class="app-tabs" aria-hidden="true">
+						{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
+							<span class:on={i === 0}>{@render icon(d)}{label}</span>
+						{/each}
+					</div>
 				</div>
-			</div>
-			<div class="showcase-copy">
-				<div class="tablist reveal" role="tablist" aria-label="Screens from the Android app">
-					{#each screens as s, i (s.name)}
-						<button role="tab" id="screen-{i}" aria-selected={screen === i} aria-controls="screen-panel" onclick={() => (screen = i)}>{s.name}</button>
-					{/each}
-				</div>
-				<div class="reveal">
-					<h2 id="list-title">Every network, one list</h2>
-					<p>A new message lifts its chat to the top, whatever network it came from. Any Matrix homeserver, plus every network a Beeper account bridges: WhatsApp, Signal, Instagram, Messenger, Telegram, Discord and more.</p>
-				</div>
-				<div class="cells reveal"><a class="cell" href="#privacy">Who sees what</a><a class="cell alt" href="#desktop">On desktop</a></div>
 			</div>
 		</section>
 
-		<section class="desktop" id="desktop" aria-labelledby="desktop-title">
-			<div class="desktop-head reveal">
-				<h2 id="desktop-title">Wide window, three panes</h2>
+		<section class="desktop wrap" aria-labelledby="desktop-title">
+			<div class="head reveal">
+				<h2 id="desktop-title">Phone or desktop, one app</h2>
 				<p>Make the window wide and the chat list, the chat and its info sit side by side. Narrow it, and it is the phone app again.</p>
 			</div>
-			<img class="reveal" src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
+			<img class="shot reveal" src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a shared sunset, a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
 		</section>
 
-		<section class="features" id="features" aria-labelledby="features-title">
-			<h2 class="reveal" id="features-title">All the chat things, none of the tracking</h2>
-			<div class="module reveal">
-				<div class="proof crop"><img src="/shots/chat.png" alt="A poll in a group chat: two options with their votes" width="420" height="880" loading="lazy" style:--x="-48px" style:--y="-628px" /></div>
-				<div class="module-text"><h3>Talk like you do everywhere</h3><p>Replies, reactions, edits, polls, mentions, voice messages and Markdown as you type.</p><p>Delete for everyone or only for you.</p></div>
+		<section class="split wrap" id="features" aria-labelledby="talk-title">
+			<div class="split-copy reveal">
+				<h2 id="talk-title">Talk like you do everywhere</h2>
+				<p>Replies, reactions, edits, polls, mentions and Markdown as you type. Photos, files and voice messages. Delete for everyone, or only for you.</p>
 			</div>
-			<div class="module reveal">
-				<div class="proof crop"><img src="/shots/settings.png" alt="The chat colour setting with ten colours" width="420" height="880" loading="lazy" style:--x="-16px" style:--y="-306px" style:--ch="164px" /></div>
-				<div class="module-text"><h3>Black, quiet, yours</h3><p>Dark, light or system theme, nine chat colours, a wallpaper and five text sizes.</p><p>In English and Polish.</p></div>
+			<div class="split-pic reveal"><img src="/shots/chat.png" alt="A group chat with a shared sunset, a reply, reactions and a poll" width="420" height="880" loading="lazy" /></div>
+		</section>
+
+		<section class="split flip wrap" aria-labelledby="look-title">
+			<div class="split-copy reveal">
+				<h2 id="look-title">Black, quiet, yours</h2>
+				<p>Dark, light or system theme, nine chat colours, a wallpaper and five text sizes. In English and Polish.</p>
 			</div>
-			<div class="module reveal">
-				<div class="proof demo" data-ui aria-hidden="true">
-					<span class="voice"><span class="play"></span>{#each wave as h, i (i)}<i style:--h="{h}px" style:--d="{i * 70}ms"></i>{/each}</span>
-				</div>
-				<div class="module-text"><h3>Voice messages</h3><p>Recorded and played right in the chat.</p><p>On Android and Linux.</p></div>
+			<div class="split-pic reveal"><img src="/shots/settings.png" alt="Appearance settings: theme, language, chat colour and text size" width="420" height="880" loading="lazy" /></div>
+		</section>
+
+		<section class="split wrap" aria-labelledby="notify-title">
+			<div class="split-copy reveal">
+				<h2 id="notify-title">Notifications that keep quiet</h2>
+				<p>Choose what a notification shows. No push service either: on Android the app keeps its own connection to your homeserver.</p>
 			</div>
-			<div class="module reveal">
-				<div class="proof demo" data-ui aria-hidden="true">
-					<span class="queue"><span class="bubble">On my way<span class="tick"><span class="clock">{@render icon(ICONS.clock)}</span><span class="sent">{@render icon(ICONS.check)}</span></span></span><span class="offline">Offline</span></span>
-				</div>
-				<div class="module-text"><h3>Offline, still sent</h3><p>Messages wait in a queue that survives losing signal and restarting the app.</p><p>They go out when the connection is back.</p></div>
+			<div class="split-pic levels reveal" data-ui>
+				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>See you at 8</span></span><figcaption>Name and message</figcaption></figure>
+				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Maya Chen</b>New message</span></span><figcaption>Name only</figcaption></figure>
+				<figure><span class="notif"><img src="/icon.svg" alt="" width="36" height="36" /><span><b>Unisend</b>New message</span></span><figcaption>Neither</figcaption></figure>
 			</div>
-			<div class="module reveal">
-				<div class="proof demo" data-ui aria-hidden="true">
-					<span class="search"><span class="field"><span class="typed">hike</span></span><span class="hit"><b>Weekend hike</b> lake, obviously</span></span>
-				</div>
-				<div class="module-text"><h3>Search on the device</h3><p>One index across every chat.</p><p>Kept here, not on a server.</p></div>
-			</div>
-			<div class="module reveal">
-				<div class="proof demo" data-ui aria-hidden="true">
-					<span class="notes"><span class="note n1"><b>Maya Chen</b>See you at 8</span><span class="note n2"><b>Maya Chen</b>New message</span><span class="note n3"><b>Unisend</b>New message</span></span>
-				</div>
-				<div class="module-text"><h3>Notifications that keep quiet</h3><p>Name and message, name only, or neither.</p><p>No push service: Android keeps its own connection.</p></div>
-			</div>
-			<div class="module reveal">
-				<div class="proof demo" data-ui aria-hidden="true">
-					<span class="verify">{#each sas as w, i (w)}<span style:--d="{i * 90}ms">{w}</span>{/each}</span>
-				</div>
-				<div class="module-text"><h3>Encrypted, end to end</h3><p>Verify a device by comparing seven emoji.</p><p>History comes back with your recovery code.</p></div>
-			</div>
+		</section>
+
+		<section class="extras wrap" aria-labelledby="extras-title">
+			<h2 class="reveal" id="extras-title">And the rest of a good chat app</h2>
+			<dl class="reveal">
+				{#each extras as [title, text] (title)}<div><dt>{title}</dt><dd>{text}</dd></div>{/each}
+			</dl>
 		</section>
 
 		<section class="privacy" id="privacy" aria-labelledby="privacy-title">
-			<h2 class="reveal" id="privacy-title">Who sees what, and nothing more</h2>
-			<div class="privacy-body">
-				<div class="privacy-pic reveal"><img src="/shots/chat.png" alt="A lake at sunset, shared in a group chat" width="420" height="880" loading="lazy" /></div>
-				<dl class="sees reveal">
-					{#each sees as s (s.who)}<div><dt>{s.who}</dt><dd>{s.what}</dd></div>{/each}
-				</dl>
+			<div class="wrap">
+				<div class="head reveal">
+					<h2 id="privacy-title">Who sees what</h2>
+					<p>No telemetry, no crash reports, no Google services, no push servers. What does leave the device goes to as few parties as it can.</p>
+				</div>
+				<div class="sees reveal">
+					<div class="parties" role="tablist" aria-label="Who sees what" aria-orientation="vertical">
+						{#each sees as s, i (s.who)}
+							<button role="tab" id="sees-{i}" aria-selected={seen === i} aria-controls="sees-panel" onclick={() => (seen = i)}>{s.who}</button>
+						{/each}
+					</div>
+					<div class="sees-panel" id="sees-panel" role="tabpanel" aria-labelledby="sees-{seen}">
+						{#key seen}<p in:fly={{ y: 8, duration: 240, easing: cubicOut }}>{sees[seen].what}</p>{/key}
+					</div>
+				</div>
 			</div>
 		</section>
 
-		<section class="zeros" aria-labelledby="zeros-title">
-			<h2 class="reveal" id="zeros-title">Nothing to report</h2>
-			<dl class="reveal">
-				{#each zeros as [what, why] (what)}<div><dt>0</dt><dd><b>{what}.</b> {why}</dd></div>{/each}
-			</dl>
+		<section class="platforms wrap" id="platforms" aria-labelledby="platforms-title">
+			<div class="head reveal">
+				<h2 id="platforms-title">Where it runs</h2>
+				<p>One Rust codebase. GPUI draws the interface and matrix-sdk talks to Matrix on its own thread, so the screen never waits on the network.</p>
+			</div>
+			<table class="reveal">
+				<tbody>{#each platforms as [os, state] (os)}<tr><th scope="row">{os}</th><td>{state}</td></tr>{/each}</tbody>
+			</table>
+		</section>
+
+		<section class="closing wrap" aria-labelledby="closing-title">
+			<img class="reveal" src="/icon.svg" alt="" width="112" height="112" loading="lazy" />
+			<h2 class="reveal" id="closing-title">Keep your account.<br />Choose your client.</h2>
+			<a class="button reveal" href="#top">Back to top</a>
 		</section>
 	</main>
 
-	<footer class="footer" aria-labelledby="footer-title">
-		<div class="footer-top">
-			<div class="reveal">
-				<h2 id="footer-title">Your account. Your client.</h2>
-				<a class="button" href="#privacy">Read who sees what</a>
-			</div>
-			<div class="platforms reveal" id="platforms">
-				<h3>Where it runs</h3>
-				<ul>{#each platforms as [os, state] (os)}<li><b>{os}</b>, {state}</li>{/each}</ul>
-				<p>One Rust codebase. GPUI draws, matrix-sdk talks to Matrix on its own thread.</p>
-			</div>
-		</div>
-		<div class="legal"><span>No trackers on this page either.</span><a href="/LICENSE-LUCIDE.txt">Icons: Lucide, ISC licence</a></div>
-		<p class="footer-name" aria-hidden="true">{@render name()}</p>
-	</footer>
+	<footer class="footer wrap"><span>Unisend. No trackers on this page either.</span><a href="/LICENSE-LUCIDE.txt">Icons: Lucide, ISC licence</a></footer>
 </div>
