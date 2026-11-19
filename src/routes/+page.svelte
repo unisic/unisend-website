@@ -132,7 +132,7 @@
 						Your
 						<span class="swap" {@attach every(nextWord, 2200)}>
 							{#key word}
-								<span class="word" style:color={networks[word].color} in:fly={{ y: '100%', duration: 450, easing: cubicOut }} out:fly={{ y: '-100%', duration: 300 }}>{networks[word].name}</span>
+								<span class="word" style:color={networks[word].color} in:fly={{ y: '100%', duration: 450, easing: cubicOut }} out:fly={{ y: '-50%', duration: 220 }}>{networks[word].name}</span>
 							{/key}
 						</span>
 						lives here now.
