@@ -1,0 +1,49 @@
+{
+	"username": "Unisend",
+	"flags": 32768,
+	"allowed_mentions": { "parse": [] },
+	"attachments": [
+		{ "id": 0, "filename": "icon.png" },
+		{ "id": 1, "filename": "desktop.png" },
+		{ "id": 2, "filename": "chat-list.png" },
+		{ "id": 3, "filename": "chat.png" },
+		{ "id": 4, "filename": "settings.png" }
+	],
+	"components": [
+		{
+			"type": 17,
+			"accent_color": 11039999,
+			"components": [
+				{
+					"type": 9,
+					"components": [
+						{ "type": 10, "content": "# Unisend\n### Every chat. One private app." },
+						{ "type": 10, "content": "A Matrix client for Android and desktop. With a Beeper account it also carries WhatsApp, Signal, Instagram, Messenger and the rest, in one list." }
+					],
+					"accessory": { "type": 11, "media": { "url": "attachment://icon.png" }, "description": "The Unisend icon" }
+				},
+				{
+					"type": 12,
+					"items": [
+						{ "media": { "url": "attachment://desktop.png" }, "description": "Unisend on desktop: the chat list beside a group chat with a shared photo, a reply, reactions and a poll" }
+					]
+				},
+				{
+					"type": 12,
+					"items": [
+						{ "media": { "url": "attachment://chat-list.png" }, "description": "The chat list on a phone" },
+						{ "media": { "url": "attachment://chat.png" }, "description": "A chat on a phone" },
+						{ "media": { "url": "attachment://settings.png" }, "description": "Settings on a phone" }
+					]
+				},
+				{ "type": 14, "divider": true, "spacing": 2 },
+				{
+					"type": 10,
+					"content": "**Encrypted, end to end.** Verify a device by comparing emoji. History comes back with your recovery code.\n**Search on the device.** One index across every chat, kept here, not on a server.\n**Sent, even offline.** Messages wait in a queue that survives losing signal and restarting the app.\n**Locked when you want.** Your phone's lock or an app PIN. Screenshots blocked on Android.\n**Every network in one list.** Sign in to each network from the app, and see when one needs you again."
+				},
+				{ "type": 14, "divider": false, "spacing": 1 },
+				{ "type": 10, "content": "-# No telemetry. No Google services. 52,422 lines of Rust, 359 tests, 826 strings in Polish." }
+			]
+		}
+	]
+}
