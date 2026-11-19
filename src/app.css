@@ -184,6 +184,14 @@ p { margin: 0; text-wrap: pretty; }
 .chip { height: 31px; display: inline-flex; align-items: center; gap: 6px; padding: 0 11px; border-radius: 999px; color: var(--muted); font-size: 13px; }
 .chip small { font-size: 13px; font-variant-numeric: tabular-nums; }
 .chip.on { color: var(--ink); background: var(--raised); }
+button.chip, button.row { border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+button.chip { color: var(--muted); font-size: 13px; transition: background-color .2s, color .2s; }
+button.chip.on { color: var(--ink); background: var(--raised); }
+button.row { width: 100%; transition: background-color .15s; }
+button.row:hover { background: #0d0d0d; }
+button.row:active { background: var(--well); }
+.empty { padding: 40px 14px; color: var(--muted); font-size: 13px; text-align: center; }
+.typing { color: var(--muted); }
 .rows { flex: 1; min-height: 0; overflow: hidden; margin: 0; padding: 0; list-style: none; }
 .row { height: 62px; display: grid; grid-template-columns: 41px 1fr auto; gap: 12px; align-items: center; padding: 0 14px; }
 /* Avatars of the app fragment, drawn like the app's demo avatars. */
@@ -206,6 +214,46 @@ p { margin: 0; text-wrap: pretty; }
 .missing { min-height: 100svh; display: grid; align-content: center; justify-items: start; gap: 28px; padding: 24px; }
 
 /* Entrances: each part rises in turn as its section arrives. */
+/* The resizable window: the app's layout widths at one scale, so its thresholds fall where the app's do. */
+.resize { display: grid; gap: 18px; margin-bottom: 72px; }
+.readout { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; min-height: 3.4em; }
+.readout b { min-width: 5.2em; font-size: var(--fs-h2); font-weight: 600; letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums; }
+.readout span { flex: 1 1 24em; color: var(--muted); }
+.frame { position: relative; }
+.win { position: absolute; top: 0; left: 0; display: flex; overflow: hidden; transform-origin: 0 0; border: 2px solid var(--raised); border-radius: 18px; background: #000; }
+.win .rows { flex: 1; }
+.win-nav { flex: none; display: grid; align-content: start; gap: 8px; padding: 18px 10px; }
+.win-nav span { height: 40px; display: flex; align-items: center; justify-content: center; gap: 14px; border-radius: 999px; color: #949494; }
+.win-nav span.on { color: var(--ink); background: var(--raised); }
+.win-nav .ico { width: 21px; height: 21px; }
+.win-nav em { display: none; font-style: normal; font-size: 15px; }
+.win-nav.labelled span { justify-content: flex-start; padding-left: 16px; }
+.win-nav.labelled em { display: inline; }
+.win-list { flex: none; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--raised); } /* taste-skill-ignore: the app's own pane divider, as in shots/desktop.png */
+.win.narrow .win-list { flex: 1; border: 0; }
+.win .row.sel { background: var(--well); }
+.win-chat { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.win-chat .app-bar { gap: 12px; font-size: 16px; padding-bottom: 14px; }
+.win-chat .app-bar .avatar { width: 34px; height: 34px; }
+.bubbles { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 10px; padding: 16px; }
+.bubbles span { max-width: 80%; padding: 9px 14px; border-radius: 20px; background: var(--well); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bubbles .mine { align-self: flex-end; background: var(--raised); }
+.composer { margin: 0 16px 16px; padding: 10px 18px; border-radius: 999px; background: var(--well); color: #949494; font-size: 15px; }
+.win-info { flex: none; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 40px 24px; border-left: 1px solid var(--raised); } /* taste-skill-ignore: the app's own pane divider */
+.win-info i { width: 100%; height: 44px; border-radius: 14px; background: var(--surface); }
+.avatar.big { width: 96px; height: 96px; }
+.grip { position: absolute; top: 0; bottom: 0; width: 24px; translate: -4px 0; display: grid; place-items: center; cursor: ew-resize; touch-action: none; border-radius: 8px; }
+.grip::after { content: ''; width: 6px; height: 64px; border-radius: 999px; background: var(--accent); transition: height .2s var(--ease), background-color .2s; }
+.grip:hover::after, .grip:focus-visible::after { height: 112px; background: var(--ink); }
+.grip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ruler { position: relative; height: 44px; }
+.ruler span { position: absolute; top: 0; padding-left: 8px; border-left: 2px solid var(--raised); color: var(--muted); font-size: 13px; line-height: 1.3; white-space: nowrap; transition: border-color .2s, color .2s; }
+.ruler b { display: block; font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
+.ruler small { font-size: inherit; }
+.ruler span.past { border-color: var(--lime); color: var(--ink); }
+.ruler span.before { translate: -100% 0; padding: 0 8px 0 0; border-left: 0; border-right: 2px solid var(--raised); text-align: right; }
+.ruler span.before.past { border-color: var(--lime); }
+
 .motion-ready .reveal { opacity: 0; translate: 0 24px; transition: opacity .7s var(--ease), translate .7s var(--ease); }
 .motion-ready .reveal.visible { opacity: 1; translate: none; }
 .motion-ready .reveal:nth-child(2) { transition-delay: .08s; }
@@ -235,6 +283,8 @@ p { margin: 0; text-wrap: pretty; }
 	.extras dl { grid-template-columns: 1fr; gap: 32px; }
 	.facts dl { grid-template-columns: 1fr; }
 	.stuck, .live { display: none; }
+	.ruler small { display: none; }
+	.ruler { height: 24px; }
 	.phone { height: 600px; }
 	.platforms th { width: 45%; }
 	.footer { flex-direction: column; }

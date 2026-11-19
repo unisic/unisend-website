@@ -47,12 +47,12 @@
 	// The same synthetic chats as the app screenshots, drawn to the app's chat list.
 	let chats = $state([
 		{ id: 1, name: 'Maya Chen', text: 'A bit torn, but it will do', you: false, unread: 3, time: '10:35', hue: 310 },
-		{ id: 2, name: 'Weekend hike', text: 'Jonas Weber: Lake, obviously', you: false, unread: 6, time: '10:35', hue: 150 },
+		{ id: 2, name: 'Weekend hike', text: 'Jonas Weber: Lake, obviously', you: false, unread: 6, time: '10:35', hue: 150, group: true },
 		{ id: 3, name: 'Ana Ruiz', text: 'Yes, 10:30 at the usual place', you: true, unread: 0, time: '10:35', hue: 25 },
 		{ id: 4, name: 'Daniel Park', text: 'The slides are in the shared folder', you: false, unread: 0, time: '10:35', hue: 205 },
 		{ id: 5, name: 'Mom', text: "Call me when you're back", you: false, unread: 0, time: '10:35', hue: 12 },
 		{ id: 6, name: 'Elif Kaya', text: 'Let me know how it turns out', you: true, unread: 0, time: '10:35', hue: 262 },
-		{ id: 7, name: 'Climbing Tuesdays', text: 'Chris Novak: Gym is open until 10 tonight', you: false, unread: 0, time: '10:35', hue: 355 },
+		{ id: 7, name: 'Climbing Tuesdays', text: 'Chris Novak: Gym is open until 10 tonight', you: false, unread: 0, time: '10:35', hue: 355, group: true },
 		{ id: 8, name: 'Jonas Weber', text: 'Great, see you there', you: false, unread: 0, time: '10:34', hue: 210 }
 	]);
 	const incoming = [
@@ -61,16 +61,116 @@
 	];
 	let clock = 10 * 60 + 35; // minutes since midnight
 	let step = 0;
+	let pending = 0;
+	let typing = $state('');
+	let typingId = $state(0);
+	// As in the app's chat list: the row says who is typing in place, then the message moves it to the top.
 	const arrive = () => {
-		const [id, text] = incoming[step++ % incoming.length];
-		const [chat] = chats.splice(chats.findIndex((c) => c.id === id), 1);
-		clock = (clock + 1) % (24 * 60);
-		const time = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, '0')}`;
-		Object.assign(chat, { text, time, you: false, unread: (chat.unread % 4) + 1 });
-		chats.unshift(chat);
-		for (const c of chats.slice(3)) c.unread = 0; // read on another device, so the counts stay few
+		const [id, text] = /** @type {[number, string]} */ (incoming[step++ % incoming.length]);
+		const group = chats.find((c) => c.id === id)?.group;
+		typingId = id;
+		typing = group ? `${text.split(': ')[0]} is typing…` : 'typing…';
+		clearTimeout(pending);
+		pending = setTimeout(() => {
+			typingId = 0;
+			const [chat] = chats.splice(chats.findIndex((c) => c.id === id), 1);
+			clock = (clock + 1) % (24 * 60);
+			const time = `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, '0')}`;
+			Object.assign(chat, { text, time, you: false, unread: (chat.unread % 4) + 1 });
+			chats.unshift(chat);
+			for (const c of chats.slice(3)) c.unread = 0; // read on another device, so the counts stay few
+		}, 1300);
 	};
 	const unread = $derived(chats.reduce((n, c) => n + c.unread, 0));
+	let onlyUnread = $state(false);
+	const shown = $derived(onlyUnread ? chats.filter((c) => c.unread) : chats);
+
+	// The desktop build's layout widths, from src/ui.rs and src/ui/info.rs in the app, with a chat's info open.
+	const W = { NARROW: 720, RAIL_W: 60, NAV_W: 210, LIST_W: 384, INFO_W: 384, CHAT_MIN: 420, RAIL_BELOW: 1400 };
+	const MIN_W = 360, MAX_W = 1600, WIN_H = 600;
+	const INFO_FROM = W.RAIL_W + W.LIST_W + W.INFO_W + W.CHAT_MIN;
+	const ticks = [[W.NARROW, 'NARROW'], [INFO_FROM, '60 + 384 + 384 + 420'], [W.RAIL_BELOW, 'RAIL_BELOW']];
+	let vw = $state(1280);
+	let k = $state(0.7);
+	let touched = false;
+	const layout = $derived.by(() => {
+		if (vw < W.NARROW) return { phone: true, nav: 0, info: false, rule: `Under ${W.NARROW}: one pane, the tabs under it, like the phone.` };
+		const nav = vw < W.RAIL_BELOW ? W.RAIL_W : W.NAV_W;
+		const info = vw >= nav + W.LIST_W + W.INFO_W + W.CHAT_MIN;
+		if (nav === W.NAV_W) return { phone: false, nav, info, rule: `From ${W.RAIL_BELOW}: the rail gets its labels and grows to ${W.NAV_W} px.` };
+		if (info) return { phone: false, nav, info, rule: `From ${INFO_FROM}, the sum of rail, list, info and the narrowest chat: the chat's info moves beside it.` };
+		return { phone: false, nav, info, rule: `From ${W.NARROW}: a ${W.RAIL_W} px rail, the ${W.LIST_W} px list and the chat.` };
+	});
+	const clamp = (/** @type {number} */ x) => Math.round(Math.min(MAX_W, Math.max(MIN_W, x)));
+
+	/** Scales the demo window to its box and, the first time it is seen, sweeps it narrow and wide once. */
+	const fit = (/** @type {HTMLElement} */ node) => {
+		const ro = new ResizeObserver(([e]) => { k = e.contentRect.width / (MAX_W + 24); });
+		ro.observe(node);
+		let raf = 0;
+		const keys = [[0, 1280], [1500, 470], [2300, 470], [4200, 1520], [4900, 1520], [6000, 1100]];
+		const ease = (/** @type {number} */ t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+		const io = new IntersectionObserver(([e]) => {
+			if (!e.isIntersecting || touched || reduced()) return;
+			io.disconnect();
+			const t0 = performance.now();
+			const tick = (/** @type {number} */ now) => {
+				const t = now - t0;
+				const i = keys.findIndex(([at]) => at > t);
+				if (touched || i < 0) { raf = 0; return; }
+				const [a, va] = keys[i - 1], [b, vb] = keys[i];
+				vw = clamp(va + (vb - va) * ease((t - a) / (b - a)));
+				raf = requestAnimationFrame(tick);
+			};
+			raf = requestAnimationFrame(tick);
+		}, { threshold: 0.6 });
+		io.observe(node);
+		return () => { ro.disconnect(); io.disconnect(); cancelAnimationFrame(raf); };
+	};
+	/** Drags the window's right edge. */
+	const grip = (/** @type {HTMLElement} */ node) => {
+		const at = (/** @type {PointerEvent} */ e) => {
+			const left = /** @type {HTMLElement} */ (node.parentElement).getBoundingClientRect().left;
+			vw = clamp((e.clientX - left) / k);
+		};
+		const down = (/** @type {PointerEvent} */ e) => { touched = true; node.setPointerCapture(e.pointerId); at(e); };
+		const move = (/** @type {PointerEvent} */ e) => { if (node.hasPointerCapture(e.pointerId)) at(e); };
+		const key = (/** @type {KeyboardEvent} */ e) => {
+			const by = e.shiftKey ? 100 : 10;
+			const to = { ArrowLeft: vw - by, ArrowDown: vw - by, ArrowRight: vw + by, ArrowUp: vw + by, Home: MIN_W, End: MAX_W }[e.key];
+			if (to === undefined) return;
+			e.preventDefault(); touched = true; vw = clamp(to);
+		};
+		node.addEventListener('pointerdown', down);
+		node.addEventListener('pointermove', move);
+		node.addEventListener('keydown', key);
+		return () => { node.removeEventListener('pointerdown', down); node.removeEventListener('pointermove', move); node.removeEventListener('keydown', key); };
+	};
+
+	/** Counts a number up from zero the first time it is seen, keeping its separators and unit. */
+	const count = (/** @type {HTMLElement} */ node) => {
+		const text = node.textContent ?? '';
+		const m = text.match(/[\d,.]+/);
+		if (!m || reduced()) return;
+		const target = Number(m[0].replace(/,/g, ''));
+		const dp = m[0].split('.')[1]?.length ?? 0;
+		const show = (/** @type {number} */ v) => { node.textContent = text.replace(m[0], v.toLocaleString('en', { minimumFractionDigits: dp, maximumFractionDigits: dp })); };
+		let raf = 0;
+		const io = new IntersectionObserver(([e]) => {
+			if (!e.isIntersecting) return;
+			io.disconnect();
+			const t0 = performance.now();
+			const tick = (/** @type {number} */ now) => {
+				const t = Math.min(1, (now - t0) / 1400);
+				show(target * (1 - (1 - t) ** 4));
+				raf = t < 1 ? requestAnimationFrame(tick) : 0;
+			};
+			show(0);
+			raf = requestAnimationFrame(tick);
+		}, { threshold: 0.6 });
+		io.observe(node);
+		return () => { io.disconnect(); cancelAnimationFrame(raf); node.textContent = text; };
+	};
 
 	// Lucide icons (ISC, see /LICENSE-LUCIDE.txt), the set the app draws with.
 	const ICONS = {
@@ -220,6 +320,18 @@
 		<svg class="back" viewBox="-6 -6 36 36" style:--rot="{s.rot}deg"><g class="edge">{@html s.d}</g></svg>
 	</div>
 {/snippet}
+{#snippet row(/** @type {typeof chats[number]} */ chat)}
+	<span class="avatar" style:--h={chat.hue}></span>
+	<span class="row-text"><b>{chat.name}</b>{#if typingId === chat.id}<span class="typing">{typing}</span>{:else}<span>{#if chat.you}{@render icon(ICONS.check)}You:{' '}{/if}{chat.text}</span>{/if}</span>
+	<span class="row-meta"><small>{chat.time}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
+{/snippet}
+{#snippet tabs()}
+	<div class="app-tabs" aria-hidden="true">
+		{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
+			<span class:on={i === 0}>{@render icon(d)}{label}</span>
+		{/each}
+	</div>
+{/snippet}
 {#snippet arrow(/** @type {boolean} */ down)}<svg class="arrow" viewBox="0 0 60 60" aria-hidden="true">{#if down}<path d="M54 6C32 8 14 22 11 52" /><path d="M4 44l7 9 7-8" />{:else}<path d="M54 54C32 52 14 38 11 8" /><path d="M4 16l7-9 7 8" />{/if}</svg>{/snippet}
 {#snippet icon(/** @type {string} */ d)}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">{@html d}</svg>{/snippet}
 
@@ -242,23 +354,23 @@
 				<div class="stuck one" aria-hidden="true">{@render sticker({ ...stickers[3], rot: 14, curl: true })}</div>
 				<div class="stuck two" aria-hidden="true">{@render sticker({ ...stickers[4], rot: -12 })}</div>
 				<p class="aside live">Live: a new message every 2.6 seconds.</p>
-				<div class="phone" data-ui role="img" aria-label="The Unisend chat list, where new messages arrive and move their chat to the top" {@attach every(arrive, 2600)}>
+				<div class="phone" data-ui role="group" aria-label="A demo of the Unisend chat list. Tap a chat to read it." {@attach every(arrive, 2600)}>
 					<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
-					<div class="chips"><span class="chip on">All</span><span class="chip">Unread <small>{unread}</small></span><span class="chip">Low priority</span></div>
+					<div class="chips">
+						<button class="chip" class:on={!onlyUnread} aria-pressed={!onlyUnread} onclick={() => (onlyUnread = false)}>All</button>
+						<button class="chip" class:on={onlyUnread} aria-pressed={onlyUnread} onclick={() => (onlyUnread = true)}>Unread <small>{unread}</small></button>
+						<span class="chip">Low priority</span>
+					</div>
 					<ul class="rows">
-						{#each chats as chat (chat.id)}
-							<li class="row" class:unread={chat.unread} animate:flip={{ duration: 480, easing: cubicOut }}>
-								<span class="avatar" style:--h={chat.hue}></span>
-								<span class="row-text"><b>{chat.name}</b><span>{#if chat.you}{@render icon(ICONS.check)}You:{' '}{/if}{chat.text}</span></span>
-								<span class="row-meta"><small>{chat.time}</small>{#if chat.unread}<em>{chat.unread}</em>{/if}</span>
+						{#each shown as chat (chat.id)}
+							<li animate:flip={{ duration: 480, easing: cubicOut }} out:fly={{ x: -40, duration: 220 }}>
+								<button class="row" class:unread={chat.unread} onclick={() => (chat.unread = 0)}>{@render row(chat)}</button>
 							</li>
+						{:else}
+							<li class="empty">All read.</li>
 						{/each}
 					</ul>
-					<div class="app-tabs" aria-hidden="true">
-						{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
-							<span class:on={i === 0}>{@render icon(d)}{label}</span>
-						{/each}
-					</div>
+					{@render tabs()}
 				</div>
 			</div>
 		</section>
@@ -267,6 +379,49 @@
 			<div class="head reveal">
 				<h2 id="desktop-title">Phone or desktop, one app</h2>
 				<p>Make the window wide and the chat list, the chat and its info sit side by side. Narrow it, and it is the phone app again.</p>
+			</div>
+			<div class="resize reveal" {@attach fit}>
+				<p class="readout"><b>{vw.toLocaleString('en')} px</b><span>{layout.rule}</span></p>
+				<div class="frame" style:height="{WIN_H * k}px">
+					<div class="win" class:narrow={layout.phone} style:width="{vw}px" style:height="{WIN_H}px" style:scale={k} aria-hidden="true">
+						{#if !layout.phone}
+							<div class="win-nav" style:width="{layout.nav}px" class:labelled={layout.nav === W.NAV_W}>
+								{#each [['Chats', ICONS.chats], ['Archive', ICONS.archive], ['Networks', ICONS.networks], ['Settings', ICONS.settings]] as [label, d], i (label)}
+									<span class:on={i === 0}>{@render icon(d)}<em>{label}</em></span>
+								{/each}
+							</div>
+						{/if}
+						<div class="win-list" style:width={layout.phone ? null : `${W.LIST_W}px`}>
+							<div class="app-bar"><b>Chats</b>{@render icon(ICONS.plus)}{@render icon(ICONS.search)}</div>
+							<ul class="rows">
+								{#each chats as chat (chat.id)}<li class="row" class:unread={chat.unread} class:sel={!layout.phone && chat.id === 2}>{@render row(chat)}</li>{/each}
+							</ul>
+							{#if layout.phone}{@render tabs()}{/if}
+						</div>
+						{#if !layout.phone}
+							<div class="win-chat">
+								<div class="app-bar"><span class="avatar" style:--h="150"></span><b>Weekend hike</b>{@render icon(ICONS.search)}</div>
+								<div class="bubbles">
+									<span>The view from the ridge last time. Worth the climb</span>
+									<span class="mine">Count me in, I'll bring snacks</span>
+									<span>Forecast says sun until 3.</span>
+									<span>Lunch at the hut or a picnic by the lake?</span>
+								</div>
+								<div class="composer">Message</div>
+							</div>
+							{#if layout.info}
+								<div class="win-info" style:width="{W.INFO_W}px" transition:fly={{ x: 60, duration: 260 }}>
+									<span class="avatar big" style:--h="150"></span><b>Weekend hike</b><i></i><i></i><i></i>
+								</div>
+							{/if}
+						{/if}
+					</div>
+					<div class="grip" role="slider" tabindex="0" aria-label="Window width" aria-valuemin={MIN_W} aria-valuemax={MAX_W} aria-valuenow={vw} aria-valuetext="{vw} pixels" style:left="{vw * k}px" {@attach grip}></div>
+				</div>
+				<div class="ruler" aria-hidden="true">
+					{#each ticks as [x, name] (x)}<span style:left="{(Number(x) / (MAX_W + 24)) * 100}%" class:past={vw >= Number(x)} class:before={x === INFO_FROM}><b>{x}</b><small>{name}</small></span>{/each}
+				</div>
+				<p class="aside">Drag the edge, or focus it and use the arrow keys. The widths are the app's own constants.</p>
 			</div>
 			<figure class="annotated reveal">
 				<img class="shot" src="/shots/desktop.png" alt="Unisend on desktop: the chat list beside a group chat with a shared sunset, a reply, reactions and a poll" width="1280" height="800" loading="lazy" />
@@ -346,7 +501,7 @@
 				<p>Counted anyway, with where each one comes from.</p>
 			</div>
 			<dl class="reveal">
-				{#each facts as [n, what, src] (n)}<div><dt>{n}</dt><dd>{what} From {src}.</dd></div>{/each}
+				{#each facts as [n, what, src] (n)}<div><dt {@attach count}>{n}</dt><dd>{what} From {src}.</dd></div>{/each}
 			</dl>
 		</section>
 
