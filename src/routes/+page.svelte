@@ -258,9 +258,11 @@
 			go(p0);
 		};
 		const move = (/** @type {PointerEvent} */ e) => {
+			if (carry) return;
 			const q = local(e);
 			if (drag) {
 				const dx = q[0] - start[0], dy = q[1] - start[1], len = Math.hypot(dx, dy), cap = 1.6 * Math.max(w, h);
+				if (len > 1.3 * Math.max(w, h)) return lift(e);
 				const s = len > cap ? cap / len : 1;
 				go([p0[0] + dx * s, p0[1] + dy * s]);
 			} else if (e.pointerType === 'mouse') {
@@ -268,7 +270,51 @@
 			}
 		};
 		const up = () => { if (!drag) return; drag = false; el.classList.remove('held'); go(rest()); };
-		const leave = () => { if (!drag) go(rest()); };
+		const leave = () => { if (!drag && !carry) go(rest()); };
+
+		// Pulled far enough, the sticker comes off whole: it moves to the page's top layer, follows the
+		// pointer with a little lag and tilt, and sticks where it is let go. One frame loop, stopped at rest.
+		let carry = false, fly = 0, pos = [0, 0], to = [0, 0], tilt = 0;
+		const follow = () => {
+			const f = reduced() ? 1 : 0.32;
+			const vx = (to[0] - pos[0]) * f;
+			pos = [pos[0] + vx, pos[1] + (to[1] - pos[1]) * f];
+			tilt += ((carry ? Math.max(-14, Math.min(14, vx * 0.8)) : 0) - tilt) * 0.25;
+			el.style.left = `${pos[0]}px`;
+			el.style.top = `${pos[1]}px`;
+			el.style.rotate = `${tilt.toFixed(2)}deg`;
+			const still = Math.hypot(to[0] - pos[0], to[1] - pos[1]) < 0.3 && Math.abs(tilt) < 0.1;
+			fly = carry || !still ? requestAnimationFrame(follow) : 0;
+			if (!fly) { el.style.rotate = ''; el.style.left = `${to[0]}px`; el.style.top = `${to[1]}px`; }
+		};
+		const aim = (/** @type {PointerEvent} */ e) => { to = [e.pageX - w / 2, e.pageY - h / 2]; if (!fly) fly = requestAnimationFrame(follow); };
+		const lift = (/** @type {PointerEvent} */ e) => {
+			drag = false; carry = true;
+			const r = el.getBoundingClientRect();
+			pos = [r.left + scrollX, r.top + scrollY];
+			if (el.parentElement !== document.body) {
+				Object.assign(el.style, { width: `${r.width}px`, height: `${r.height}px`, left: `${pos[0]}px`, top: `${pos[1]}px` });
+				el.setAttribute('aria-hidden', 'true');
+				document.body.append(el);
+			}
+			el.classList.remove('held', 'slap');
+			el.classList.add('loose', 'carried');
+			cancelAnimationFrame(raf); raf = 0; p = goal = [...p0]; draw();
+			aim(e);
+			addEventListener('pointermove', aim);
+			addEventListener('pointerup', drop);
+			addEventListener('pointercancel', drop);
+		};
+		const drop = () => {
+			carry = false;
+			removeEventListener('pointermove', aim);
+			removeEventListener('pointerup', drop);
+			removeEventListener('pointercancel', drop);
+			el.classList.remove('carried');
+			void el.offsetWidth; // restarts the press animation on a second drop
+			el.classList.add('slap');
+			if (!fly) fly = requestAnimationFrame(follow);
+		};
 		size(); p0 = [w * 0.86, h * 0.86]; p = rest(); goal = [...p]; draw();
 		el.addEventListener('pointerdown', down);
 		el.addEventListener('pointermove', move);
@@ -277,6 +323,9 @@
 		el.addEventListener('pointerleave', leave);
 		return () => {
 			cancelAnimationFrame(raf);
+			cancelAnimationFrame(fly);
+			for (const [t, f] of /** @type {const} */ ([['pointermove', aim], ['pointerup', drop], ['pointercancel', drop]])) removeEventListener(t, f);
+			if (el.parentElement === document.body) el.remove();
 			for (const [t, f] of /** @type {const} */ ([['pointerdown', down], ['pointermove', move], ['pointerup', up], ['pointercancel', up], ['pointerleave', leave]])) el.removeEventListener(t, f);
 		};
 	};
@@ -473,6 +522,7 @@
 						{@render sticker(s)}
 					</div>
 				{/each}
+				<p class="aside hint">Peel one back, or pull it right off and stick it anywhere on the page.</p>
 			</div>
 		</section>
 

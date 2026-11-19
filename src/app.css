@@ -144,6 +144,12 @@ p { margin: 0; text-wrap: pretty; }
 .sticker .mark { fill: none; stroke: #fff; stroke-width: 2; }
 .sticker .back { display: none; transform-origin: 0 0; }
 .sticker .back .edge { fill: #d4d4d4; stroke: #d4d4d4; }
+/* A sticker pulled off whole, carried and stuck anywhere on the page. */
+.sticker.loose { position: absolute; inset: auto; z-index: 2; transition: scale .15s var(--ease), filter .15s; }
+.sticker.carried { scale: 1.08; cursor: grabbing; filter: drop-shadow(0 12px 16px rgb(0 0 0 / .5)); }
+.sticker.slap { animation: slap .24s var(--ease); }
+@keyframes slap { 45% { scale: .92; } }
+.sheet .hint { position: absolute; inset: auto 0 -2.4em; max-width: none; text-align: center; }
 
 /* Privacy: a field of its own. */
 .privacy { margin-top: var(--gap); padding-block: var(--gap); background: var(--surface); }
@@ -293,5 +299,6 @@ button.row:active { background: var(--well); }
 	html { scroll-behavior: auto; }
 	.page *, .page *::before, .page *::after { animation: none; }
 	.button, .parties button { transition: none; }
+	.sticker.slap { animation: none; }
 	.motion-ready .reveal, .motion-ready .reveal.visible { opacity: 1; translate: none; transition: none; }
 }
