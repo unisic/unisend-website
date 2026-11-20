@@ -600,9 +600,9 @@
 				<h2 id="facts-title">Numbers nobody asked for</h2>
 				<p>Counted anyway, with where each one comes from.</p>
 			</div>
-			<dl class="reveal">
-				{#each facts as [n, what, src] (n)}<div><dt {@attach count}>{n}</dt><dd>{what} <code>{src}</code></dd></div>{/each}
-			</dl>
+			<table class="ledger reveal">
+				<tbody>{#each facts as [n, what, src] (n)}<tr><th scope="row" {@attach count}>{n}</th><td>{what}</td><td><code>{src}</code></td></tr>{/each}</tbody>
+			</table>
 		</section>
 
 		<div class="end wrap">

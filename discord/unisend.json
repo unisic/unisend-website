@@ -14,11 +14,11 @@
           "components": [
             {
               "type": 10,
-              "content": "# Unisend\n### Every chat. One private app."
+              "content": "# Unisend\n### A Matrix client."
             },
             {
               "type": 10,
-              "content": "A Matrix client for Android and desktop. With a Beeper account it also carries WhatsApp, Signal, Instagram, Messenger and the rest, in one list."
+              "content": "For Android and the Linux desktop. Any homeserver works; a Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list."
             }
           ],
           "accessory": {
