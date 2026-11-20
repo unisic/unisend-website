@@ -394,13 +394,62 @@
 		['macOS', 'In progress'],
 		['Windows', 'Compiles, never run']
 	];
+
+	// shortcut: the only public address so far, change it here when the site gets its own domain.
+	const site = 'https://app.deandark.me/';
+	const title = 'Unisend, a Matrix client for Android and Linux';
+
+	// Discord shows this instead of the OG card when the link is pasted. It never runs scripts, so it
+	// has to be in the prerendered <head>, and the payload is capped at 3000 bytes.
+	// https://docs.discord.com/developers/link-previews/component-embeds
+	const discordEmbed = JSON.stringify({
+		component: {
+			type: 17,
+			accent_color: 0xa874ff,
+			components: [
+				{
+					type: 9,
+					components: [
+						{ type: 10, content: `## [Unisend](${site})\nA Matrix client for Android and the Linux desktop.\n-# version 0.1.0` }
+					],
+					accessory: { type: 11, media: { url: `${site}apple-touch-icon.png` }, description: 'The Unisend icon' }
+				},
+				{ type: 10, content: 'Any homeserver works. A Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list.' },
+				{ type: 12, items: [{ media: { url: `${site}shots/desktop.png` }, description: 'Unisend on desktop: the chat list beside a group chat' }] },
+				{
+					type: 12,
+					items: ['chat-list', 'chat', 'settings'].map((s) => ({ media: { url: `${site}shots/${s}.png` } }))
+				},
+				{ type: 10, content: '-# No telemetry, no crash reports, no Google services. Screenshots with made-up chats.' },
+				{ type: 14, divider: true, spacing: 1 },
+				{
+					type: 1,
+					components: [
+						{ type: 2, style: 5, label: 'GitHub', url: 'https://github.com/unisic/unisend' },
+						{ type: 2, style: 5, label: 'Discord', url: 'https://discord.gg/U2Eyw6xQBz' }
+					]
+				}
+			]
+		}
+	}).replaceAll('<', '\\u003c');
 </script>
 
 <svelte:head>
-	<title>Unisend, a Matrix client for Android and Linux</title>
+	<title>{title}</title>
 	<meta name="description" content="A Matrix chat client for Android and desktop. Any homeserver, or a Beeper account with its bridges to WhatsApp, Signal, Instagram and more. No telemetry, no Google services." />
-	<meta property="og:title" content="Unisend, a Matrix client for Android and Linux" />
+	<link rel="canonical" href={site} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Unisend" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:title" content={title} />
 	<meta property="og:description" content="A Matrix chat client for Android and desktop." />
+	<meta property="og:url" content={site} />
+	<meta property="og:image" content="{site}shots/desktop.png" />
+	<meta property="og:image:width" content="1280" />
+	<meta property="og:image:height" content="800" />
+	<meta property="og:image:alt" content="Unisend on desktop: the chat list beside a group chat with a shared photo, a reply, reactions and a poll" />
+	<meta name="twitter:card" content="summary_large_image" />
+	{@html `<script id="discord:component-embed" type="application/json">${discordEmbed}</script>`}
 </svelte:head>
 
 {#snippet sticker(/** @type {{ d: string, fill: string, rot: number, curl?: boolean }} */ s)}
