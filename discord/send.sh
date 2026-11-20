@@ -3,7 +3,7 @@
 # webhook docs a Components V2 message may carry nothing but `components` (no `files[n]`), so the
 # icon, the screenshots and the button point at the site, which must be reachable from the web.
 # The webhook URL is a secret: pass it in the environment, never as an argument.
-#   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/... SITE_URL=https://unisend.example ./discord/send.sh
+#   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/... SITE_URL=https://app.deandark.me ./discord/send.sh
 set -eu
 : "${DISCORD_WEBHOOK_URL:?set DISCORD_WEBHOOK_URL to the channel's webhook URL}"
 : "${SITE_URL:?set SITE_URL to where the site is served, for the images and the button}"

@@ -14,11 +14,7 @@
           "components": [
             {
               "type": 10,
-              "content": "# Unisend\n### A Matrix client."
-            },
-            {
-              "type": 10,
-              "content": "For Android and the Linux desktop. Any homeserver works; a Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list."
+              "content": "# Unisend\nA Matrix client for Android and the Linux desktop.\n-# version 0.1.0"
             }
           ],
           "accessory": {
@@ -28,6 +24,10 @@
             },
             "description": "The Unisend icon"
           }
+        },
+        {
+          "type": 10,
+          "content": "Any homeserver works. A Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list."
         },
         {
           "type": 12,
@@ -53,15 +53,19 @@
               "media": {
                 "url": "/shots/chat.png"
               },
-              "description": "A chat on a phone"
+              "description": "A group chat on a phone: a photo, a reply, reactions, a poll"
             },
             {
               "media": {
                 "url": "/shots/settings.png"
               },
-              "description": "Settings on a phone"
+              "description": "Appearance settings on a phone: theme, language, chat colour and text size"
             }
           ]
+        },
+        {
+          "type": 10,
+          "content": "-# Taken from the app, with made-up chats. Nobody real is in them."
         },
         {
           "type": 14,
@@ -70,16 +74,20 @@
         },
         {
           "type": 10,
-          "content": "**Encrypted, end to end.** Verify a device by comparing emoji. History comes back with your recovery code.\n**Search on the device.** One index across every chat, kept here, not on a server.\n**Sent, even offline.** Messages wait in a queue that survives losing signal and restarting the app.\n**Locked when you want.** Your phone's lock or an app PIN. Screenshots blocked on Android.\n**Every network in one list.** Sign in to each network from the app, and see when one needs you again."
+          "content": "### What it does\n- Replies, reactions, edits, polls, Markdown as you type\n- End-to-end encryption; verify a device by comparing emoji\n- Search across every chat, in a local index on the device\n- Messages wait in a queue that survives losing signal and restarting the app\n- App lock with the phone's lock or an app PIN; screenshots blocked on Android\n- No push service: on Android the app keeps its own connection to your homeserver"
+        },
+        {
+          "type": 10,
+          "content": "### Where it runs\n```\nAndroid   main target, tested on a phone\nLinux     built and tested\nmacOS     in progress\nWindows   compiles, never run\n```"
         },
         {
           "type": 14,
-          "divider": false,
+          "divider": true,
           "spacing": 1
         },
         {
           "type": 10,
-          "content": "-# No telemetry. No Google services. 52,422 lines of Rust, 359 tests, 826 strings in Polish."
+          "content": "-# No telemetry, no crash reports, no Google services. 52,422 lines of Rust, 359 tests, 826 strings in Polish."
         },
         {
           "type": 1,
