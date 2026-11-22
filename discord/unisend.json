@@ -14,7 +14,7 @@
           "components": [
             {
               "type": 10,
-              "content": "# Unisend\nA Matrix client for Android and the Linux desktop.\n-# version 0.1.0"
+              "content": "# Unisend\nA Matrix client for Android and Linux.\n-# version 0.1.0, macOS in progress"
             }
           ],
           "accessory": {
@@ -27,7 +27,7 @@
         },
         {
           "type": 10,
-          "content": "Any homeserver works. A Beeper account adds its bridges, so WhatsApp, Signal, Messenger, Instagram and Telegram land in the same list."
+          "content": "Any homeserver, plus Beeper bridges: WhatsApp, Signal, Telegram and more in one list."
         },
         {
           "type": 12,
@@ -41,44 +41,13 @@
           ]
         },
         {
-          "type": 12,
-          "items": [
-            {
-              "media": {
-                "url": "/shots/chat-list.png"
-              },
-              "description": "The chat list on a phone"
-            },
-            {
-              "media": {
-                "url": "/shots/chat.png"
-              },
-              "description": "A group chat on a phone: a photo, a reply, reactions, a poll"
-            },
-            {
-              "media": {
-                "url": "/shots/settings.png"
-              },
-              "description": "Appearance settings on a phone: theme, language, chat colour and text size"
-            }
-          ]
-        },
-        {
-          "type": 10,
-          "content": "-# Taken from the app, with made-up chats. Nobody real is in them."
-        },
-        {
           "type": 14,
           "divider": true,
           "spacing": 2
         },
         {
           "type": 10,
-          "content": "### What it does\n- Replies, reactions, edits, polls, Markdown as you type\n- End-to-end encryption; verify a device by comparing emoji\n- Search across every chat, in a local index on the device\n- Messages wait in a queue that survives losing signal and restarting the app\n- App lock with the phone's lock or an app PIN; screenshots blocked on Android\n- No push service: on Android the app keeps its own connection to your homeserver"
-        },
-        {
-          "type": 10,
-          "content": "### Where it runs\n```\nAndroid   main target, tested on a phone\nLinux     built and tested\nmacOS     in progress\nWindows   compiles, never run\n```"
+          "content": "### What it does\n- E2EE, verified by comparing emoji\n- Local search across all chats\n- Messages queue while offline\n- App lock and screenshot blocking"
         },
         {
           "type": 14,
@@ -87,7 +56,7 @@
         },
         {
           "type": 10,
-          "content": "-# No telemetry, no crash reports, no Google services. 52,422 lines of Rust, 359 tests, 826 strings in Polish."
+          "content": "-# Made-up chats in the screenshot. No telemetry, no Google services, no push service. 52,422 lines of Rust, 359 tests."
         },
         {
           "type": 1,
