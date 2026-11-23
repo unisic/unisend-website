@@ -194,13 +194,14 @@
 	let seen = $state(1);
 
 	// Lucide icons (ISC) as die-cut stickers, one in each of the app's nine chat colours (ChatColour in the app).
+	// Only closed shapes: an open path (an arc, a crossing slash) fills as a chord and leaves shards at the edge.
 	const stickers = [
 		{ label: 'Voice notes', fill: '#2e6ef0', x: 6, y: 8, rot: -8, d: '<path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/>' },
-		{ label: 'Offline queue', fill: '#e8710a', x: 38, y: 4, rot: 6, d: '<path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/>' },
+		{ label: 'Offline queue', fill: '#e8710a', x: 38, y: 4, rot: 6, d: '<path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/>' },
 		{ label: 'Local search', fill: '#00838f', x: 70, y: 10, rot: -4, d: '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>' },
 		{ label: 'App lock', fill: '#734ef3', x: 10, y: 40, rot: 5, d: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>' },
 		{ label: 'End to end', fill: '#2e7d32', x: 41, y: 37, rot: -7, d: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>', curl: true },
-		{ label: 'Quiet alerts', fill: '#c2185b', x: 72, y: 42, rot: 9, d: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"/><path d="m2 2 20 20"/><path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"/>' },
+		{ label: 'Quiet alerts', fill: '#c2185b', x: 72, y: 42, rot: 9, d: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>' },
 		{ label: 'Nine colours', fill: '#4f5bd5', x: 5, y: 72, rot: -3, d: '<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/>' },
 		{ label: 'Reactions', fill: '#d32f2f', x: 39, y: 70, rot: 7, d: '<path d="M13.267 2.08a10 10 0 108.653 8.653"/><path d="M15 10V9"/><path d="M16 5h6"/><path d="M16.472 15a6 6 0 01-8.943 0"/><path d="M19 2v6"/><path d="M9 10V9"/>' },
 		{ label: 'Polls', fill: '#37474f', x: 71, y: 74, rot: -6, d: '<path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/>' }
