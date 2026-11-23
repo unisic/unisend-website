@@ -2,6 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { site } from '#lib/site.js';
 
 	const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -396,8 +397,6 @@
 		['Windows', 'Compiles, never run']
 	];
 
-	// shortcut: the only public address so far, change it here when the site gets its own domain.
-	const site = 'https://app.deandark.me/';
 	const title = 'Unisend, a Matrix client for Android and Linux';
 
 	// Discord shows this instead of the OG card when the link is pasted. It never runs scripts, so it
@@ -478,7 +477,7 @@
 	<a class="skip" href="#main">Skip to content</a>
 	<header class="nav wrap">
 		<a class="brand" href="#top" aria-label="Unisend, back to top"><img src="/icon.svg" alt="" width="28" height="28" />Unisend</a>
-		<span class="ver">version 0.1.0</span>
+		<div class="nav-end"><a href="/docs/">Docs</a><span class="ver">version 0.1.0</span></div>
 	</header>
 
 	<main id="main">

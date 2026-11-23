@@ -78,6 +78,8 @@ p { margin: 0; text-wrap: pretty; }
 .nav { min-height: 80px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
 .ver { color: var(--muted); font-size: var(--fs-small); }
+.nav-end { display: flex; align-items: baseline; gap: 24px; font-size: var(--fs-small); }
+.nav-end a { padding-block: 12px; text-underline-offset: 3px; }
 
 /* Hero: the claim and its spec on the left, the app itself, live and measured, on the right. */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 4vw, 64px); align-items: center; padding-block: clamp(32px, 6vw, 72px) var(--gap); }
