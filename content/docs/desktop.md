@@ -33,6 +33,12 @@ Ctrl on Linux and Windows is Command on macOS; Alt is Option. Settings, Chats, *
 | Esc | Go back |
 | Ctrl+/ | Keyboard shortcuts |
 
+## Keyboard and screen readers
+
+Tab and Shift+Tab move through the buttons and the actions of a message's menu, with a ring on the one the keyboard is on; Enter or Space presses it. The chat list and the messages are one stop each: the arrow keys, Home, End, Page Up and Page Down move through their rows, and Enter opens the chat or the message's actions.
+
+Buttons, chats and messages carry names for screen readers (AT-SPI on Linux): a chat reads its name, network, time, unread count and last message; a message its sender, text, time and reactions. This has not been tried with a screen reader yet.
+
 ## Running with the window closed
 
 With **Keep running when the window is closed** on (Settings, Notifications), closing the window leaves Unisend running, so messages and notifications keep arriving.

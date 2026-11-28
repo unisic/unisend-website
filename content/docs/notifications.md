@@ -16,6 +16,8 @@ Settings, Notifications, **Stay connected in the background**:
 
 On the desktop, **Keep running when the window is closed** does the same job. On, messages and notifications keep arriving after you close the window, and on Linux a tray icon gets a dot while a chat waits. Off, closing the window quits. Windows has no tray icon, so there closing the window always quits.
 
+The app's icon shows how many chats wait, muted, archived and low-priority ones left out: the Dock badge on macOS, a red circle on the taskbar button on Windows, and the launcher count on Linux where the desktop shows one (KDE Plasma, Dash to Dock).
+
 ## What a notification shows
 
 Settings, Notifications, **Show**: the sender's name and the message, the name only, or neither.

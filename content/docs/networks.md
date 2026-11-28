@@ -37,6 +37,6 @@ Some things do not exist on the Matrix side, or no bridge passes them on:
 - **Live location**: there is no stable Matrix event for it. Sending your current location works where the bridge supports it.
 - **Messenger chat themes and nicknames**.
 - **Backups** from WhatsApp, Signal or Meta's clouds.
-- **Threads** on bridged networks: only rooms that live on Matrix have real threads, and Unisend does not show threads yet.
+- **Threads** on bridged networks: only rooms that live on Matrix have real threads; Unisend shows those, and a bridged chat whose network has no threads gets no Reply in thread.
 
 Other features depend on the bridge: editing, deleting for everyone, reactions, polls, disappearing messages and contact cards work on a bridged chat only where that bridge supports them. Edit and delete follow the limits of the chat's network.

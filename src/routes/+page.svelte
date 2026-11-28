@@ -190,7 +190,7 @@
 		{ who: 'Your homeserver', what: 'What any Matrix server sees: your account, the rooms you are in, message metadata, your IP address and the content of unencrypted rooms. Encrypted rooms are end-to-end encrypted.' },
 		{ who: 'Beeper bridges', what: 'Only with a Beeper account. A bridge has to read a message to pass it between Matrix and the other network, so it sees the content of bridged chats.' },
 		{ who: 'The other network', what: 'WhatsApp, Messenger and the rest see what they always see. Nothing more comes from Unisend.' },
-		{ who: 'Anyone else', what: 'Only for what you turn on or tap: a site you link, once, with link previews on; GIF search, in builds that include it; an emoji font you download; a location you open. Builds made with an update address ask it once a day for update.json, with no identifier.' }
+		{ who: 'Anyone else', what: 'Only for what you turn on or tap: a site you link, once, with link previews on; GIF search, in builds that include it; an emoji font you download; a location you open. Builds made with an update address ask it for update.json, with no identifier, when you tap Check now, or once a day if you turn that on.' }
 	];
 	let seen = $state(1);
 
@@ -410,7 +410,7 @@
 				{
 					type: 9,
 					components: [
-						{ type: 10, content: `## [Unisend](${site})\nA Matrix client for Android and the Linux desktop.\n-# version 0.1.0` }
+						{ type: 10, content: `## [Unisend](${site})\nA Matrix client for Android and the Linux desktop.\n-# version 0.1.2` }
 					],
 					accessory: { type: 11, media: { url: `${site}apple-touch-icon.png` }, description: 'The Unisend icon' }
 				},
@@ -477,7 +477,7 @@
 	<a class="skip" href="#main">Skip to content</a>
 	<header class="nav wrap">
 		<a class="brand" href="#top" aria-label="Unisend, back to top"><img src="/icon.svg" alt="" width="28" height="28" />Unisend</a>
-		<div class="nav-end"><a href="/docs/">Docs</a><span class="ver">version 0.1.0</span></div>
+		<div class="nav-end"><a href="/docs/">Docs</a><span class="ver">version 0.1.2</span></div>
 	</header>
 
 	<main id="main">
@@ -672,7 +672,7 @@
 					<div><dt>Type</dt><dd>Inter, the face the app draws with, and JetBrains Mono for what is quoted from the code. Both under the SIL Open Font License.</dd></div>
 					<div><dt>Icons</dt><dd>Lucide, under the <a href="/LICENSE-LUCIDE.txt">ISC licence</a>, the set the app uses.</dd></div>
 					<div><dt>Pictures</dt><dd>Screenshots of the app with made-up chats. Nobody real is in them.</dd></div>
-					<div><dt>The app</dt><dd>Version 0.1.0. Rust, GPUI for what you see, matrix-sdk for Matrix. Keep your account, choose your client.</dd></div>
+					<div><dt>The app</dt><dd>Version 0.1.2. Rust, GPUI for what you see, matrix-sdk for Matrix. Keep your account, choose your client.</dd></div>
 				</dl>
 			</section>
 		</div>

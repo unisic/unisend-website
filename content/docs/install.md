@@ -7,14 +7,14 @@ group: "Getting started"
 
 ## Downloads
 
-Every release is on [GitHub](https://github.com/unisic/unisend/releases/latest). For 0.1.1:
+Every release is on [GitHub](https://github.com/unisic/unisend/releases/latest). For 0.1.2:
 
 | Platform | File |
 |---|---|
-| Android 8.0 or newer (arm64) | `Unisend-0.1.1.apk` |
-| Linux x86_64 | `Unisend-0.1.1-x86_64.AppImage` |
-| macOS 11 or newer (Apple silicon and Intel) | `Unisend-0.1.1-macos-universal.zip` |
-| Windows x64 | `Unisend-0.1.1-windows-x64.zip` |
+| Android 8.0 or newer (arm64) | `Unisend-0.1.2.apk` |
+| Linux x86_64 | `Unisend-0.1.2-x86_64.AppImage` |
+| macOS 11 or newer (Apple silicon and Intel) | `Unisend-0.1.2-macos-universal.zip` |
+| Windows x64 | `Unisend-0.1.2-windows-x64.zip` |
 
 `SHA256SUMS` on the same page lists the checksum of each file. To check a download, run this in the folder that holds both:
 
@@ -28,7 +28,7 @@ sha256sum --ignore-missing -c SHA256SUMS
 2. Android asks whether the browser or file manager you opened it from may install apps. Allow it for that app.
 3. Install, then open Unisend.
 
-The APK is signed with the same release key as 0.1.0, so it installs over 0.1.0 and keeps your data. The key's certificate SHA-256 is:
+The APK is signed with the same release key as 0.1.0 and 0.1.1, so it installs over them and keeps your data. The key's certificate SHA-256 is:
 
 ```
 c0:fc:54:dc:20:8d:d1:ee:cd:3d:c9:66:47:ae:f2:d2:99:23:26:d0:8e:35:1f:d0:a9:dd:a8:2f:19:29:a8:1b
@@ -42,8 +42,8 @@ c0:fc:54:dc:20:8d:d1:ee:cd:3d:c9:66:47:ae:f2:d2:99:23:26:d0:8e:35:1f:d0:a9:dd:a8
 The AppImage needs glibc 2.39 or newer. It uses the system's GTK 3, WebKitGTK 4.1 and GStreamer, so those come from your distribution.
 
 ```sh
-chmod +x Unisend-0.1.1-x86_64.AppImage
-./Unisend-0.1.1-x86_64.AppImage
+chmod +x Unisend-0.1.2-x86_64.AppImage
+./Unisend-0.1.2-x86_64.AppImage
 ```
 
 What each library is for:

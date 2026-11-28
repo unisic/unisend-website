@@ -15,6 +15,10 @@ group: "Using Unisend"
 ## Acting on a message
 
 - Reply, react, edit, forward to up to 5 chats, and delete for everyone or only for you.
+- Threads: a message with replies in a thread shows how many; a tap opens the thread in the chat's place. **Reply in thread** in the message menu starts or continues one. Replies in a thread stay out of the chat.
+- Select text: on the desktop, drag over a message, double click for a word, triple click for a line, then Ctrl+C. On a phone, **Select text** in the message menu.
+- E-mail addresses open the mail app, phone numbers the dialer (copied on a computer), Matrix IDs and room aliases open New chat, and sites written without https:// open in the browser. Codes and long numbers are underlined; a tap copies them.
+- A link whose text names another site than the one it opens asks before opening. matrix.to and matrix: links open the chat or message they point to. **Copy link** is in the message menu.
 - The reaction bar shows six reactions. Settings, Chats, Reactions chooses which six and in what order, and what a double tap on a message gives.
 - Polls: create one, vote, end it.
 - Contact cards, and disappearing messages where the network allows them.
@@ -24,8 +28,10 @@ group: "Using Unisend"
 - Send photos, videos and files with a caption. On the desktop, drag them in or paste them.
 - Before a photo or video goes, Unisend removes location and camera details from it (JPEG, PNG, WebP, GIF, HEIC, AVIF, MP4, MOV, WebM, MKV). Any other picture is drawn anew, which leaves the details behind.
 - A video the network refuses, or one in a format that cannot be cleaned, can be made into an MP4 on the device first: with ffmpeg on the desktop, with the phone's own codecs on Android.
-- A full-screen picture viewer with zoom, and a video player on Android.
-- Voice messages are recorded and played inside the chat on Android and Linux. On macOS and Windows, audio opens in the system's player.
+- A full-screen picture viewer with zoom, and a video player on Android and Linux (on macOS and Windows, videos open in the system's player). A double tap on either side skips 10 s; a button sets the speed to 1x, 1.5x or 2x.
+- A received video without a thumbnail shows its first frame, and a video sent from Linux carries one.
+- Voice messages are recorded and played inside the chat on Android and Linux, with a waveform even when the sender's app gave none. On macOS and Windows, audio opens in the system's player.
+- On the desktop, files opened from a chat and saved media go to the Downloads folder.
 - Each chat's info page holds its media, links and files.
 - Send your location from Android.
 
@@ -33,7 +39,8 @@ Settings, Data and storage, **Media auto-download** decides what downloads by it
 
 ## The chat list
 
-- Chat folders: chips over the chat list. The built-in ones (All, Unread, Direct, Groups, one per network, Low priority) fill themselves; your own are a name and the chats you pick. Settings, Chats, Chat folders manages them. They stay on this device.
+- Chat folders: chips over the chat list. The built-in ones (All, Unread, Direct, Groups, Unanswered, Drafts, one per network, Low priority) fill themselves; your own are a name and the chats you pick. Settings, Chats, Chat folders manages them. They stay on this device.
+- Each chat shows its network's mark on its picture.
 - Archive, pin, mark as unread, and mute for 1 hour, 8 hours, 1 day, 7 days or always. Mentions still notify in a muted chat.
 - Swipe a chat row left or right for an action; Settings, Chats chooses which.
 - **Keep muted chats archived**: new messages do not bring a muted chat back from the archive.

@@ -46,7 +46,7 @@ Settings taken from another device through the server go end-to-end encrypted be
 The release downloads have neither of these. They exist only in builds made with their own keys (see [Build from source](/docs/build)):
 
 - **KLIPY**, with a KLIPY key, only when you open the GIF picker: your IP address, what you search for, the GIF you send and a random ID made once per app start.
-- **An update host**, in Android builds made with `UNISEND_UPDATE_URL`: a plain request for `update.json` with no identifier, once a day or when you tap Check now.
+- **An update host**, in Android builds made with `UNISEND_UPDATE_URL`: a plain request for `update.json` with no identifier, when you tap Check now, or once a day if you turn that on.
 
 ## What other people see
 

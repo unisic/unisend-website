@@ -11,7 +11,7 @@ Unisend is a Matrix chat client for Android and the Linux desktop. It works with
 
 It is written in Rust. [GPUI](https://www.gpui.rs) draws the interface and matrix-sdk talks to Matrix. The source is on GitHub at [unisic/unisend](https://github.com/unisic/unisend).
 
-These pages describe version 0.1.1, the latest release.
+These pages describe version 0.1.2, the latest release.
 
 ## Where it runs
 
